@@ -304,7 +304,7 @@ function bind() {
 function seedIfEmpty() {
   if (donors.length === 0) {
     donors = [
-      { id: uid(), name: "Anitha R", bloodGroup: "O+", dob: "1994-03-22", phone: "+91 98765 43210", email: "anitha@example.com", location: "Eathamozhi", addedAt: new Date().toISOString() },
+      { id: uid(), name: "Mohamed Shahid S", bloodGroup: "B+", dob: "2004-06-25", phone: "+91 7339110968", email: "moh.shahid2004@gmail.com", location: "Eathamozhi", addedAt: new Date().toISOString() },
       { id: uid(), name: "Ravi K", bloodGroup: "A+", dob: "1988-11-05", phone: "+91 91234 56780", email: "", location: "Near Lake", addedAt: new Date().toISOString() }
     ];
     save();
