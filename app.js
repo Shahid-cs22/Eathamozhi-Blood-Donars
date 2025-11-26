@@ -307,7 +307,7 @@ function seedIfEmpty() {
       { id: uid(), name: "Mohamed Shahid S", bloodGroup: "B+", dob: "2004-06-25", phone: "+91 7339110968", email: "moh.shahid2004@gmail.com", location: "Eathamozhi", addedAt: new Date().toISOString() },
       { id: uid(), name: "Ravi K", bloodGroup: "A+", dob: "1988-11-05", phone: "+91 91234 56780", email: "", location: "Near Lake", addedAt: new Date().toISOString() }
     ];
-    save();
+    // save();
   }
 }
 
