@@ -1,27 +1,21 @@
-/* Local Storage Key */
-const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
+const STORAGE_KEY = "eathamozhi_blood_donors_v1";
 let donors = [];
 
 const $ = (s) => document.querySelector(s);
 
-/* -------- LOAD & SAVE -------- */
+/* LOAD & SAVE */
 function load() {
-  try {
-    donors = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    donors = [];
-  }
+  donors = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 }
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(donors));
 }
 function uid() {
-  return 'd_' + Math.random().toString(36).slice(2, 9);
+  return "d_" + Math.random().toString(36).slice(2, 9);
 }
 
-/* -------- UTILITIES -------- */
+/* AGE CALCULATOR */
 function computeAge(dobIso) {
-  if (!dobIso) return '';
   const dob = new Date(dobIso);
   const today = new Date();
   let age = today.getFullYear() - dob.getFullYear();
@@ -30,27 +24,51 @@ function computeAge(dobIso) {
   return age;
 }
 
-/* -------- RENDER LIST -------- */
+/* DASHBOARD UPDATE */
+function updateDashboard() {
+  $('#totalDonors').textContent = donors.length;
+
+  const today = new Date().toISOString().slice(0, 10);
+  $('#donorsToday').textContent = donors.filter(d => d.addedAt.startsWith(today)).length;
+
+  const bloodCount = {};
+  donors.forEach(d => bloodCount[d.bloodGroup] = (bloodCount[d.bloodGroup] || 0) + 1);
+
+  const common = donors.length
+    ? Object.entries(bloodCount).sort((a, b) => b[1] - a[1])[0][0]
+    : "—";
+
+  $('#commonBlood').textContent = common;
+
+  // Recent 5 donors
+  const list = $('#recentDonors');
+  list.innerHTML = "";
+  donors.slice(0, 5).forEach(d => {
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${d.name}</strong> <span>${d.bloodGroup}</span>`;
+    list.appendChild(li);
+  });
+}
+
+/* RENDER DONOR LIST */
 function render() {
   const list = $('#listSection');
-  list.innerHTML = '';
+  list.innerHTML = "";
 
-  const search = $('#search').value.trim().toLowerCase();
+  const search = $('#search').value.toLowerCase();
   const blood = $('#bloodFilter').value;
 
   const filtered = donors.filter(d =>
     (!blood || d.bloodGroup === blood) &&
-    (
-      d.name.toLowerCase().includes(search) ||
+    (d.name.toLowerCase().includes(search) ||
       d.phone.toLowerCase().includes(search) ||
-      d.location.toLowerCase().includes(search)
-    )
+      d.location.toLowerCase().includes(search))
   );
 
-  filtered.forEach((d) => {
-    const row = document.createElement('div');
-    row.className = "card";
-    row.innerHTML = `
+  filtered.forEach(d => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
       <div>
         <strong>${d.name}</strong> (${d.bloodGroup})<br>
         Age: ${computeAge(d.dob)}<br>
@@ -58,20 +76,21 @@ function render() {
         Location: ${d.location}<br>
         Added: ${new Date(d.addedAt).toLocaleString()}
       </div>
+
       <div class="actions">
         <button class="primary btn-animated editBtn">Edit</button>
         <button class="danger btn-animated delBtn">Delete</button>
       </div>
     `;
 
-    row.querySelector(".editBtn").onclick = () => openForm("edit", d.id);
-    row.querySelector(".delBtn").onclick = () => removeDonor(d.id);
+    card.querySelector(".editBtn").onclick = () => openForm("edit", d.id);
+    card.querySelector(".delBtn").onclick = () => removeDonor(d.id);
 
-    list.appendChild(row);
+    list.appendChild(card);
   });
 }
 
-/* -------- FORM HANDLING -------- */
+/* OPEN / CLOSE FORM */
 function openForm(mode, id) {
   $('#formDrawer').setAttribute("aria-hidden", "false");
   $('#donorForm').reset();
@@ -103,7 +122,7 @@ function closeForm() {
   $('#formDrawer').setAttribute("aria-hidden", "true");
 }
 
-/* -------- ADD / UPDATE DONOR -------- */
+/* ADD OR UPDATE DONOR */
 function addDonorFromForm() {
   const id = $('#donorId').value || uid();
   const name = $('#name').value.trim();
@@ -135,9 +154,10 @@ function addDonorFromForm() {
 
   save();
   render();
+  updateDashboard();
   closeForm();
 
-  /* -------- SEND EMAIL -------- */
+  // EMAIL SEND
   emailjs.send("blood-eathamozhi-service", "template_q56xd65", {
     name,
     bloodGroup,
@@ -146,32 +166,33 @@ function addDonorFromForm() {
     email,
     location,
     addedAt: new Date().toLocaleString()
-  })
-    .then(() => console.log("Email sent!"))
-    .catch(err => console.error("Email failed:", err));
+  });
 }
 
-/* -------- DELETE DONOR -------- */
+/* DELETE DONOR */
 function removeDonor(id) {
   donors = donors.filter(d => d.id !== id);
   save();
   render();
+  updateDashboard();
 }
 
-/* -------- EVENTS -------- */
+/* EVENTS */
 function bind() {
   $('#addBtn').onclick = () => openForm("add");
   $('#cancelBtn').onclick = closeForm;
+
   $('#donorForm').onsubmit = (e) => {
     e.preventDefault();
     addDonorFromForm();
   };
-  $('#dob').onchange = () => $('#age').value = computeAge($('#dob').value);
   $('#search').oninput = render;
   $('#bloodFilter').onchange = render;
+  $('#dob').onchange = () => $('#age').value = computeAge($('#dob').value);
 }
 
-/* -------- INIT -------- */
+/* INIT */
 load();
 bind();
 render();
+updateDashboard();

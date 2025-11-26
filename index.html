@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Eathamozhi Blood Donars</title>
 
-  <!-- existing stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Tamil Google Font -->
@@ -14,7 +13,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kavivanar&display=swap" rel="stylesheet">
 
-  <!-- Tamil font for subtitle -->
   <style>
     .subtitle {
       font-family: 'Kavivanar', 'Noto Sans Tamil', Inter, system-ui, sans-serif;
@@ -25,7 +23,7 @@
   <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <script>
     (function () {
-      emailjs.init("Uj5t9Er9dmO3ZDDBy");  /* your public key */
+      emailjs.init("Uj5t9Er9dmO3ZDDBy");  /* Your public key */
     })();
   </script>
 </head>
@@ -43,6 +41,32 @@
   </header>
 
   <main class="container">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="dashboard">
+      <div class="dash-card">
+        <h3>Total Donors</h3>
+        <p id="totalDonors">0</p>
+      </div>
+
+      <div class="dash-card">
+        <h3>Added Today</h3>
+        <p id="donorsToday">0</p>
+      </div>
+
+      <div class="dash-card">
+        <h3>Common Blood Group</h3>
+        <p id="commonBlood">—</p>
+      </div>
+    </section>
+
+    <!-- RECENT DONORS -->
+    <section class="recent-section">
+      <h3>Recent Donors</h3>
+      <ul id="recentDonors" class="recent-list"></ul>
+    </section>
+
+    <!-- CONTROLS -->
     <section class="controls">
       <button id="addBtn" class="primary btn-animated">Add Donor</button>
 
@@ -53,7 +77,7 @@
 
         <label class="filter">
           <select id="bloodFilter">
-            <option value="">All blood groups</option>
+            <option value="">All</option>
             <option>A+</option><option>A-</option>
             <option>B+</option><option>B-</option>
             <option>AB+</option><option>AB-</option>
@@ -65,7 +89,7 @@
 
     <section id="listSection" class="list-section"></section>
 
-    <!-- Donor Form Drawer -->
+    <!-- FORM DRAWER -->
     <aside id="formDrawer" class="drawer" aria-hidden="true">
       <form id="donorForm" class="donor-form">
         <header class="form-head">
@@ -74,7 +98,10 @@
         </header>
 
         <div class="row">
-          <label>Full name <input id="name" required /></label>
+          <label>Full name
+            <input id="name" required />
+          </label>
+
           <label>Blood group
             <select id="bloodGroup" required>
               <option value="">Select</option>
@@ -87,16 +114,28 @@
         </div>
 
         <div class="row">
-          <label>DOB <input id="dob" type="date" required /></label>
-          <label>Age <input id="age" readonly /></label>
+          <label>DOB
+            <input id="dob" type="date" required />
+          </label>
+
+          <label>Age
+            <input id="age" readonly />
+          </label>
         </div>
 
         <div class="row">
-          <label>Phone <input id="phone" type="tel" required /></label>
-          <label>Email <input id="email" type="email" /></label>
+          <label>Phone
+            <input id="phone" type="tel" required />
+          </label>
+
+          <label>Email
+            <input id="email" type="email" />
+          </label>
         </div>
 
-        <label>Location <input id="location" /></label>
+        <label>Location
+          <input id="location" />
+        </label>
 
         <div class="form-actions">
           <button type="submit" class="primary btn-animated">Save</button>
@@ -106,6 +145,7 @@
         <input type="hidden" id="donorId" />
       </form>
     </aside>
+
   </main>
 
   <footer class="site-footer">
@@ -114,4 +154,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
