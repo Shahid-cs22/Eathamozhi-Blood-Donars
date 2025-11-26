@@ -1,72 +1,40 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Eathamozhi Blood Donars</title>
 
+  <!-- existing stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Tamil Google Font -->
+  <!-- Tamil Google Font: preconnect + Kavivanar -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kavivanar&display=swap" rel="stylesheet">
 
+  <!-- Apply Kavivanar to Tamil text (subtitle) -->
   <style>
     .subtitle {
-      font-family: 'Kavivanar', 'Noto Sans Tamil', Inter, system-ui, sans-serif;
+      font-family: 'Kavivanar', 'Noto Sans Tamil', Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
   </style>
-
-  <!-- EmailJS -->
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    (function () {
-      emailjs.init("Uj5t9Er9dmO3ZDDBy");  /* Your public key */
-    })();
-  </script>
 </head>
-
 <body>
   <header class="site-header">
     <div class="brand">
-      <img class="logo jpd-logo" src="./images/Eathamozhi-Jumma-Masjid-new.png" alt="Logo">
+      <!-- Use a static JPG/PNG for the logo -->
+      <img class="logo jpd-logo" src="./images/Eathamozhi-Jumma-Masjid-new.png" alt="JPD logo">
 
       <div>
         <h1>Eathamozhi Blood Donars</h1>
+        <!-- Tamil subtitle using Kavivanar -->
         <p class="subtitle">ரஹ்மானியா இளைஞர் மன்றம்</p>
       </div>
     </div>
   </header>
 
   <main class="container">
-
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="dashboard">
-      <div class="dash-card">
-        <h3>Total Donors</h3>
-        <p id="totalDonors">0</p>
-      </div>
-
-      <div class="dash-card">
-        <h3>Added Today</h3>
-        <p id="donorsToday">0</p>
-      </div>
-
-      <div class="dash-card">
-        <h3>Common Blood Group</h3>
-        <p id="commonBlood">—</p>
-      </div>
-    </section>
-
-    <!-- RECENT DONORS -->
-    <section class="recent-section">
-      <h3>Recent Donors</h3>
-      <ul id="recentDonors" class="recent-list"></ul>
-    </section>
-
-    <!-- CONTROLS -->
     <section class="controls">
       <button id="addBtn" class="primary btn-animated">Add Donor</button>
 
@@ -76,8 +44,8 @@
         </label>
 
         <label class="filter">
-          <select id="bloodFilter">
-            <option value="">All</option>
+          <select id="bloodFilter" aria-label="Filter by blood group">
+            <option value="">All blood groups</option>
             <option>A+</option><option>A-</option>
             <option>B+</option><option>B-</option>
             <option>AB+</option><option>AB-</option>
@@ -87,23 +55,25 @@
       </div>
     </section>
 
-    <section id="listSection" class="list-section"></section>
+    <section id="listSection" class="list-section" aria-live="polite"></section>
 
-    <!-- FORM DRAWER -->
-    <aside id="formDrawer" class="drawer" aria-hidden="true">
-      <form id="donorForm" class="donor-form">
+    <!-- Animated drawer form -->
+    <aside id="formDrawer" class="drawer" aria-hidden="true" aria-labelledby="formTitle" role="dialog">
+      <form id="donorForm" class="donor-form" autocomplete="off">
         <header class="form-head">
           <h2 id="formTitle">Add Donor</h2>
-          <button type="button" id="cancelBtn" class="icon-btn">&times;</button>
+          <button type="button" id="cancelBtn" class="icon-btn" aria-label="Close form">&times;</button>
         </header>
 
         <div class="row">
-          <label>Full name
-            <input id="name" required />
+          <label>
+            Full name
+            <input id="name" name="name" required />
           </label>
 
-          <label>Blood group
-            <select id="bloodGroup" required>
+          <label>
+            Blood group
+            <select id="bloodGroup" name="bloodGroup" required>
               <option value="">Select</option>
               <option>A+</option><option>A-</option>
               <option>B+</option><option>B-</option>
@@ -114,45 +84,57 @@
         </div>
 
         <div class="row">
-          <label>DOB
-            <input id="dob" type="date" required />
+          <label>
+            Date of birth
+            <input id="dob" name="dob" type="date" required />
           </label>
 
-          <label>Age
-            <input id="age" readonly />
+          <label>
+            Age
+            <input id="age" name="age" readonly />
           </label>
         </div>
 
         <div class="row">
-          <label>Phone
-            <input id="phone" type="tel" required />
+          <label>
+            Phone
+            <input id="phone" name="phone" type="tel" pattern="^[+0-9 ()-]{6,}$" required />
           </label>
 
-          <label>Email
-            <input id="email" type="email" />
+          <label>
+            Email
+            <input id="email" name="email" type="email" />
           </label>
         </div>
 
-        <label>Location
-          <input id="location" />
+        <label>
+          Location (city/area)
+          <input id="location" name="location" />
         </label>
 
         <div class="form-actions">
-          <button type="submit" class="primary btn-animated">Save</button>
-          <button type="button" id="deleteBtn" class="danger btn-animated" hidden>Delete</button>
+          <!-- Single button: Add / Update (text changes in JS) -->
+          <button type="submit" class="primary btn-animated" id="saveBtn">Save</button>
         </div>
 
         <input type="hidden" id="donorId" />
       </form>
     </aside>
-
   </main>
 
   <footer class="site-footer">
-    <small>Local-only demo using localStorage.</small>
+    <small>Local-only demo (localStorage). Works offline. Use the console helpers for import/export.</small>
   </footer>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function () {
+      // 🔴 Replace with your actual EmailJS PUBLIC KEY
+      emailjs.init("Uj5t9Er9dmO3ZDDBy");
+    })();
+  </script>
 
   <script src="app.js"></script>
 </body>
-
 </html>
