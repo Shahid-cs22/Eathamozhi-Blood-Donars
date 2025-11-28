@@ -3,77 +3,79 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Eathamozhi Blood Donars</title>
+  <title>Eathamozhi Blood Donors</title>
 
-  <!-- existing stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Tamil Google Font: preconnect + Kavivanar -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kavivanar&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600&family=Kavivanar&display=swap" rel="stylesheet">
 
-  <!-- Apply Kavivanar to Tamil text (subtitle) -->
-  <style>
-    .subtitle {
-      font-family: 'Kavivanar', 'Noto Sans Tamil', Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
-  </style>
 </head>
 <body>
+
+  <!-- Top header -->
   <header class="site-header">
     <div class="brand">
-      <!-- Use a static JPG/PNG for the logo -->
-      <img class="logo jpd-logo" src="./images/Eathamozhi-Jumma-Masjid-new.png" alt="JPD logo">
-
-      <div>
-        <h1>Eathamozhi Blood Donars</h1>
-        <!-- Tamil subtitle using Kavivanar -->
+      <img class="logo" src="./images/Eathamozhi-Jumma-Masjid-new.png" alt="Eathamozhi Logo">
+      <div class="brand-text">
+        <h1>Eathamozhi Blood Donors</h1>
         <p class="subtitle">ரஹ்மானியா இளைஞர் மன்றம்</p>
       </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="themeToggle" class="ghost-btn">Dark Mode</button>
     </div>
   </header>
 
   <main class="container">
-    <section class="controls">
-      <button id="addBtn" class="primary btn-animated">Add Donor</button>
+
+    <!-- Controls -->
+    <section class="controls card-shell">
+      <div class="primary-actions">
+        <button id="addBtn" class="primary btn-animated">+ Add Donor</button>
+        <button id="exportBtn" class="primary outlined btn-animated">⬇ Export CSV</button>
+      </div>
 
       <div class="filters">
-        <label class="filter">
-          <input id="search" type="search" placeholder="Search name, phone or location..." />
-        </label>
-
-        <label class="filter">
-          <select id="bloodFilter" aria-label="Filter by blood group">
-            <option value="">All blood groups</option>
+        <div class="field">
+          <input id="search" type="search" placeholder="Search by name, phone or location..." />
+        </div>
+        <div class="field">
+          <select id="bloodFilter">
+            <option value="">All Blood Groups</option>
             <option>A+</option><option>A-</option>
             <option>B+</option><option>B-</option>
             <option>AB+</option><option>AB-</option>
             <option>O+</option><option>O-</option>
           </select>
-        </label>
+        </div>
       </div>
     </section>
 
-    <section id="listSection" class="list-section" aria-live="polite"></section>
+    <!-- Donor List -->
+    <section id="listSection" class="list-section"></section>
 
-    <!-- Animated drawer form -->
-    <aside id="formDrawer" class="drawer" aria-hidden="true" aria-labelledby="formTitle" role="dialog">
-      <form id="donorForm" class="donor-form" autocomplete="off">
+    <!-- Drawer Form -->
+    <aside id="formDrawer" class="drawer" aria-hidden="true">
+      <form id="donorForm" class="donor-form">
         <header class="form-head">
-          <h2 id="formTitle">Add Donor</h2>
+          <div>
+            <h2 id="formTitle">Add Donor</h2>
+            <p class="form-subtitle">Please fill the donor details carefully.</p>
+          </div>
           <button type="button" id="cancelBtn" class="icon-btn" aria-label="Close form">&times;</button>
         </header>
 
-        <div class="row">
-          <label>
-            Full name
-            <input id="name" name="name" required />
+        <div class="row two-col">
+          <label>Full Name
+            <input id="name" required />
           </label>
 
-          <label>
-            Blood group
-            <select id="bloodGroup" name="bloodGroup" required>
+          <label>Blood Group
+            <select id="bloodGroup" required>
               <option value="">Select</option>
               <option>A+</option><option>A-</option>
               <option>B+</option><option>B-</option>
@@ -83,57 +85,51 @@
           </label>
         </div>
 
-        <div class="row">
-          <label>
-            Date of birth
-            <input id="dob" name="dob" type="date" required />
+        <div class="row two-col">
+          <label>Date of Birth
+            <input id="dob" type="date" required />
           </label>
 
-          <label>
-            Age
-            <input id="age" name="age" readonly />
+          <label>Age
+            <input id="age" readonly />
           </label>
         </div>
 
-        <div class="row">
-          <label>
-            Phone
-            <input id="phone" name="phone" type="tel" pattern="^[+0-9 ()-]{6,}$" required />
+        <div class="row two-col">
+          <label>Phone
+            <input id="phone" required />
           </label>
 
-          <label>
-            Email
-            <input id="email" name="email" type="email" />
+          <label>Email
+            <input id="email" type="email" placeholder="Optional" />
           </label>
         </div>
 
-        <label>
-          Location (city/area)
-          <input id="location" name="location" />
+        <label>Location
+          <input id="location" placeholder="Village / City" />
         </label>
 
         <div class="form-actions">
-          <!-- Single button: Add / Update (text changes in JS) -->
-          <button type="submit" class="primary btn-animated" id="saveBtn">Save</button>
+          <button type="submit" class="primary btn-animated">Save</button>
+          <button type="button" id="deleteBtn" class="danger" hidden>Delete</button>
         </div>
+
+        <p class="hint-text">
+          <strong>Note:</strong> Only the device that added this donor can edit their details.
+        </p>
 
         <input type="hidden" id="donorId" />
       </form>
     </aside>
+
+    <!-- Floating Add Button (mobile) -->
+    <button id="fabAdd" class="fab" aria-label="Add donor">+</button>
+
   </main>
 
   <footer class="site-footer">
-    <small>Local-only demo (localStorage). Works offline. Use the console helpers for import/export.</small>
+    <small>Local Storage Version • Works Offline • Designed for Eathamozhi Community</small>
   </footer>
-
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    (function () {
-      // 🔴 Replace with your actual EmailJS PUBLIC KEY
-      emailjs.init("Uj5t9Er9dmO3ZDDBy");
-    })();
-  </script>
 
   <script src="app.js"></script>
 </body>

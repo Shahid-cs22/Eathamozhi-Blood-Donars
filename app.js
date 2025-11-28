@@ -1,378 +1,333 @@
-/* Eathamozhi Blood Donors - enhanced with animations (ripple, enter/leave, drawer)
-   - Age computed from DOB (keeps current age when rendered)
-   - Responsive: table on wide, cards on narrow
-   - Animated add/edit interactions (no delete)
-   - Data persisted to localStorage
-   - Sends email to moh.shahid2004@gmail.com on NEW donor
-*/
+/* Eathamozhi Blood Donors - Modern Version (Option A) */
 
 const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
+const OWNER_KEY   = 'eathamozhi_my_donor_id';
+
 let donors = [];
-
 const $ = (s) => document.querySelector(s);
-const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-/* --- Persistence --- */
-function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    donors = raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    console.error('Load error', e);
-    donors = [];
-  }
+/* Load + Save */
+function load(){
+  donors = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 }
-function save() {
+function save(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(donors));
 }
-function uid() { return 'd_' + Math.random().toString(36).slice(2,9); }
-
-/* --- Utilities --- */
-function computeAge(dobIso) {
-  if (!dobIso) return '';
-  const dob = new Date(dobIso);
-  if (isNaN(dob)) return '';
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-  return age >= 0 ? age : '';
-}
-function safe(s) {
-  if (!s) return '';
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+function uid(){
+  return "d_" + Math.random().toString(36).slice(2,10);
 }
 
-/* ripple effect for buttons */
-function attachRipples() {
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-animated, .icon-btn');
-    if (!btn) return;
-    const rect = btn.getBoundingClientRect();
-    const r = document.createElement('span');
-    r.className = 'ripple';
-    const size = Math.max(rect.width, rect.height) * 1.2;
-    r.style.width = r.style.height = size + 'px';
-    r.style.left = (e.clientX - rect.left - size/2) + 'px';
-    r.style.top = (e.clientY - rect.top - size/2) + 'px';
-    btn.appendChild(r);
-    r.addEventListener('animationend', () => r.remove());
-  });
+/* OWNER HELPERS (for edit-only-by-creator) */
+function getOwnerId(){
+  return localStorage.getItem(OWNER_KEY);
+}
+function setOwnerId(id){
+  localStorage.setItem(OWNER_KEY, id);
 }
 
-/* --- Rendering --- */
-function render() {
-  const listSection = $('#listSection');
-  listSection.innerHTML = '';
-
-  const q = $('#search').value.trim().toLowerCase();
-  const bloodFilter = $('#bloodFilter').value;
-
-  const filtered = donors.filter(d => {
-    if (bloodFilter && d.bloodGroup !== bloodFilter) return false;
-    if (!q) return true;
-    return (d.name||'').toLowerCase().includes(q) ||
-           (d.phone||'').toLowerCase().includes(q) ||
-           (d.location||'').toLowerCase().includes(q);
-  });
-
-  if (window.innerWidth > 800) {
-    // Table layout
-    const table = document.createElement('table');
-    table.className = 'table';
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Name</th><th>Blood</th><th>Age</th><th>Phone</th><th>Location</th><th>Added</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    `;
-    const tbody = table.querySelector('tbody');
-
-    filtered.forEach((d, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${safe(d.name)}</td>
-        <td><strong>${safe(d.bloodGroup)}</strong></td>
-        <td>${computeAge(d.dob) || ''}</td>
-        <td>${safe(d.phone)}</td>
-        <td>${safe(d.location)}</td>
-        <td>${new Date(d.addedAt).toLocaleString()}</td>
-        <td class="actions"></td>
-      `;
-      // animate entries with slight stagger
-      tr.classList.add('animate-in');
-      tr.style.animationDelay = (idx * 40) + 'ms';
-
-      const actions = tr.querySelector('.actions');
-      const edit = makeBtn('Edit', () => openForm('edit', d.id), 'primary');
-      // ⛔ No delete button
-      actions.append(edit);
-
-      tbody.appendChild(tr);
-    });
-
-    listSection.appendChild(table);
-  } else {
-    // Card layout
-    filtered.forEach((d, idx) => {
-      const card = document.createElement('article');
-      card.className = 'card animate-in';
-      card.style.animationDelay = (idx * 40) + 'ms';
-      card.innerHTML = `
-        <div class="meta">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div class="badge">${safe(d.bloodGroup)}</div>
-            <div>
-              <div style="font-weight:700">${safe(d.name)}</div>
-              <div style="color:var(--muted);font-size:0.9rem">
-                ${computeAge(d.dob) ? computeAge(d.dob) + ' yrs' : ''} · ${safe(d.location)}
-              </div>
-            </div>
-          </div>
-
-          <div style="color:var(--muted);font-size:0.9rem;margin-top:8px">
-            Phone: ${safe(d.phone)}<br/>
-            Email: ${safe(d.email)}<br/>
-            Added: ${new Date(d.addedAt).toLocaleString()}
-          </div>
-        </div>
-        <div class="actions">
-          <button class="primary btn-animated">Edit</button>
-        </div>
-      `;
-      const [editBtn] = card.querySelectorAll('.actions button');
-      editBtn.addEventListener('click', () => openForm('edit', d.id));
-      listSection.appendChild(card);
-    });
-  }
-
-  if (filtered.length === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'card animate-in';
-    empty.style.textAlign = 'center';
-    empty.innerHTML = `<div style="color:var(--muted)">No donors found — add one with the Add Donor button.</div>`;
-    listSection.appendChild(empty);
-  }
+/* AGE */
+function computeAge(dob){
+  const d = new Date(dob);
+  if (isNaN(d)) return "";
+  const t = new Date();
+  let age = t.getFullYear() - d.getFullYear();
+  const m = t.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < d.getDate())) age--;
+  return age;
 }
 
-/* helper to create accessible buttons */
-function makeBtn(text, onClick, type = 'primary') {
-  const b = document.createElement('button');
-  b.textContent = text;
-  b.className = type === 'danger' ? 'danger btn-animated' : 'primary btn-animated';
-  b.addEventListener('click', onClick);
-  return b;
+/* DATE FORMAT (DD/MM/YYYY) */
+function formatDate(iso){
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  return d.toLocaleDateString("en-GB");
 }
 
-/* --- Form (drawer) --- */
-function openForm(mode='add', id) {
-  const drawer = $('#formDrawer');
-  drawer.setAttribute('aria-hidden', 'false');
-  const title = $('#formTitle');
-  const donorId = $('#donorId');
-  const saveBtn = $('#saveBtn');
+/* RELATIVE TIME ("2 days ago") */
+function relativeTime(dateIso) {
+  const now = new Date();
+  const past = new Date(dateIso);
+  if (isNaN(past)) return "";
+  const seconds = Math.floor((now - past) / 1000);
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
-  $('#donorForm').reset();
-  $('#age').value = '';
-
-  if (mode === 'add') {
-    title.textContent = 'Add Donor';
-    saveBtn.textContent = 'Add Donor';
-    donorId.value = '';
-  } else {
-    title.textContent = 'Edit Donor';
-    saveBtn.textContent = 'Update Donor';
-    const donor = donors.find(x => x.id === id);
-    if (!donor) {
-      alert('Donor not found');
-      return;
-    }
-    $('#name').value = donor.name || '';
-    $('#bloodGroup').value = donor.bloodGroup || '';
-    $('#dob').value = donor.dob || '';
-    $('#age').value = computeAge(donor.dob) || '';
-    $('#phone').value = donor.phone || '';
-    $('#email').value = donor.email || '';
-    $('#location').value = donor.location || '';
-    donorId.value = donor.id;
-  }
-  // focus first input for keyboard users
-  setTimeout(() => $('#name').focus(), 200);
-}
-function closeForm() {
-  $('#formDrawer').setAttribute('aria-hidden', 'true');
-}
-
-/* --- Email sending --- */
-function sendEmail(rec) {
-  if (!window.emailjs) {
-    console.warn('EmailJS not loaded; skipping email send.');
-    return;
-  }
-
-  const templateParams = {
-    donor_name: rec.name,
-    donor_blood_group: rec.bloodGroup,
-    donor_dob: rec.dob,
-    donor_age: computeAge(rec.dob) || '',
-    donor_phone: rec.phone,
-    donor_email: rec.email || 'N/A',
-    donor_location: rec.location || 'N/A',
-    to_email: 'moh.shahid2004@gmail.com'
+  const intervals = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+    second: 1
   };
 
-  // Uses your service & template IDs
-  emailjs
-    .send('blood-eathamozhi', 'template_q56xd65', templateParams)
-    .then((res) => {
-      console.log('Email sent:', res.status, res.text);
-    })
-    .catch((err) => {
-      console.error('Email send failed:', err);
-    });
+  for (const key in intervals) {
+    const value = Math.floor(seconds / intervals[key]);
+    if (value >= 1) return rtf.format(-value, key);
+  }
+  return "just now";
 }
 
-/* --- CRUD operations (no delete) --- */
-function addDonorFromForm() {
-  const id = $('#donorId').value || uid();
-  const name = $('#name').value.trim();
-  const bloodGroup = $('#bloodGroup').value;
-  const dob = $('#dob').value;
-  const phone = $('#phone').value.trim();
-  const email = $('#email').value.trim();
-  const location = $('#location').value.trim();
+/* RENDER LIST */
+function render(){
+  const sec = $("#listSection");
+  sec.innerHTML = "";
 
-  if (!name || !bloodGroup || !dob || !phone) {
-    alert('Please enter name, blood group, DOB and phone.');
-    return;
+  const q = ($("#search")?.value || "").toLowerCase();
+  const bf = $("#bloodFilter")?.value || "";
+
+  const filtered = donors.filter(d =>
+    (!bf || d.bloodGroup === bf) &&
+    (
+      d.name.toLowerCase().includes(q) ||
+      (d.phone || "").toLowerCase().includes(q) ||
+      (d.location || "").toLowerCase().includes(q)
+    )
+  );
+
+  const ownerId = getOwnerId();
+
+  /* DESKTOP TABLE */
+  if (window.innerWidth > 800){
+    if (!filtered.length){
+      sec.innerHTML = `<p style="text-align:center;color:#6b7280;font-size:0.9rem;">No donors found. Try a different search or add a new donor.</p>`;
+      return;
+    }
+
+    const t = document.createElement("table");
+    t.className = "table";
+    t.innerHTML = `
+      <thead><tr>
+        <th>Name</th><th>Blood</th><th>Age</th>
+        <th>Phone</th><th>Location</th>
+        <th>Added</th><th>Edit</th>
+      </tr></thead>
+      <tbody></tbody>
+    `;
+    const body = t.querySelector("tbody");
+
+    filtered.forEach(d=>{
+      const canEdit = ownerId === d.id;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${d.name}</td>
+        <td>${d.bloodGroup}</td>
+        <td>${computeAge(d.dob)}</td>
+        <td>${d.phone}</td>
+        <td>${d.location || "—"}</td>
+        <td>
+          ${formatDate(d.addedAt)}<br>
+          <small style="color:#6b7280;">${relativeTime(d.addedAt)}</small>
+        </td>
+        <td>
+          ${
+            canEdit
+              ? `<button class="primary btn-animated" style="padding:6px 10px;font-size:0.75rem;" onclick="openForm('edit','${d.id}')">Edit</button>`
+              : `<span style="font-size:0.75rem;color:#9ca3af;">No access</span>`
+          }
+        </td>
+      `;
+      body.appendChild(tr);
+    });
+
+    sec.appendChild(t);
   }
 
-  const idx = donors.findIndex(d => d.id === id);
+  /* MOBILE CARD VIEW */
+  else {
+    if (!filtered.length){
+      sec.innerHTML = `<p style="text-align:center;color:#6b7280;font-size:0.9rem;">No donors found. Tap + to add a donor.</p>`;
+      return;
+    }
+
+    filtered.forEach(d=>{
+      const canEdit = ownerId === d.id;
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <div class="meta-main">
+          <div class="badge" data-bg="${d.bloodGroup}">${d.bloodGroup}</div>
+          <div class="meta-text">
+            <strong>${d.name}</strong>
+            <span>${computeAge(d.dob)} yrs • ${d.location || "—"}</span>
+          </div>
+        </div>
+
+        <div class="card-info-line">
+          <strong>Phone:</strong> ${d.phone}<br>
+          <strong>Email:</strong> ${d.email || "—"}<br>
+          <strong>Added:</strong> ${formatDate(d.addedAt)}
+          <small>(${relativeTime(d.addedAt)})</small>
+        </div>
+
+        <div class="card-footer">
+          <small>ID: ${d.id}</small>
+          ${
+            canEdit
+              ? `<button class="primary btn-animated" style="padding:6px 10px;font-size:0.8rem;" onclick="openForm('edit','${d.id}')">Edit</button>`
+              : `<small style="color:#9ca3af;">View only</small>`
+          }
+        </div>
+      `;
+      sec.appendChild(card);
+    });
+  }
+}
+
+/* OPEN FORM */
+function openForm(mode,id){
+  const drawer = $("#formDrawer");
+  drawer?.setAttribute("aria-hidden","false");
+  $("#donorForm")?.reset();
+  const deleteBtn = $("#deleteBtn");
+  if (deleteBtn){
+    deleteBtn.hidden = true;   // DELETE DISABLED
+    deleteBtn.style.display = "none";
+  }
+
+  if (mode === "add"){
+    $("#formTitle").textContent = "Add Donor";
+    $("#donorId").value = "";
+    $("#age").value = "";
+  } else {
+    const d = donors.find(x=>x.id===id);
+    if (!d) return;
+    $("#formTitle").textContent = "Edit Donor";
+    $("#name").value = d.name;
+    $("#bloodGroup").value = d.bloodGroup;
+    $("#dob").value = d.dob;
+    $("#age").value = computeAge(d.dob);
+    $("#phone").value = d.phone;
+    $("#email").value = d.email;
+    $("#location").value = d.location;
+    $("#donorId").value = d.id;
+  }
+}
+
+function closeForm(){
+  $("#formDrawer")?.setAttribute("aria-hidden","true");
+}
+
+/* SAVE */
+$("#donorForm").addEventListener("submit", e=>{
+  e.preventDefault();
+
+  const id = $("#donorId").value || uid();
+  const idx = donors.findIndex(d=>d.id===id);
+
   const rec = {
     id,
-    name,
-    bloodGroup,
-    dob,
-    phone,
-    email,
-    location,
+    name:$("#name").value.trim(),
+    bloodGroup:$("#bloodGroup").value,
+    dob:$("#dob").value,
+    phone:$("#phone").value.trim(),
+    email:$("#email").value.trim(),
+    location:$("#location").value.trim(),
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
   };
 
-  const isNew = idx < 0;
+  if (!rec.name || !rec.bloodGroup || !rec.dob || !rec.phone){
+    alert("Please fill all required fields.");
+    return;
+  }
 
-  if (idx >= 0) {
+  if (idx >= 0){
     donors[idx] = rec;
   } else {
     donors.unshift(rec);
+    // mark this device as the owner of this donor
+    setOwnerId(id);
   }
 
   save();
-  render();
   closeForm();
+  render();
+});
 
-  // Send email ONLY when a new donor is added
-  if (isNew) {
-    sendEmail(rec);
-  }
+/* DELETE REMOVED – stub only */
+function removeDonor(id){
+  console.warn("Delete is disabled.");
 }
 
-/* --- Event bindings --- */
-function bind() {
-  $('#addBtn').addEventListener('click', () => openForm('add'));
-  $('#cancelBtn').addEventListener('click', closeForm);
-
-  $('#donorForm').addEventListener('submit', (ev) => {
-    ev.preventDefault();
-    addDonorFromForm();
-  });
-
-  $('#dob').addEventListener('change', () => {
-    $('#age').value = computeAge($('#dob').value) || '';
-  });
-
-  $('#search').addEventListener('input', () => render());
-  $('#bloodFilter').addEventListener('change', () => render());
-
-  // Close drawer when clicking outside (desktop)
-  document.addEventListener('click', (e) => {
-    const drawer = $('#formDrawer');
-    if (drawer.getAttribute('aria-hidden') === 'false') {
-      const inside = drawer.contains(e.target) || $('#addBtn').contains(e.target);
-      if (!inside && window.innerWidth > 800) closeForm();
-    }
-  });
-
-  // responsive re-render on resize (debounced)
-  let rt;
-  window.addEventListener('resize', () => {
-    clearTimeout(rt);
-    rt = setTimeout(render, 160);
-  });
+/* HIDE DELETE BUTTON IN FORM (defensive) */
+const deleteBtn = $("#deleteBtn");
+if (deleteBtn) {
+  deleteBtn.style.display = "none";
+  deleteBtn.hidden = true;
 }
 
-/* --- Demo seed data --- */
-function seedIfEmpty() {
-  if (donors.length === 0) {
-    donors = [
-      {
-        id: uid(),
-        name: "Mohamed Shahid",
-        bloodGroup: "B+",
-        dob: "2004-06-25",
-        phone: "+91 7339110968",
-        email: "moh.shahid2004@gmail.com",
-        location: "Eathamozhi",
-        addedAt: new Date().toISOString()
-      },
-      {
-        id: uid(),
-        name: "Ravi K",
-        bloodGroup: "A+",
-        dob: "1988-11-05",
-        phone: "+91 91234 56780",
-        email: "",
-        location: "Near Lake",
-        addedAt: new Date().toISOString()
-      }
-    ];
-    save();
-  }
-}
+/* AUTO AGE */
+$("#dob").addEventListener("change",()=>{
+  $("#age").value = computeAge($("#dob").value);
+});
 
-/* --- Console helpers --- */
-window.EathamozhiDonors = {
-  export: () => JSON.stringify(donors, null, 2),
-  import: (json) => {
-    try {
-      const parsed = typeof json === 'string' ? JSON.parse(json) : json;
-      if (!Array.isArray(parsed)) throw new Error('Expected array');
-      donors = parsed.map(p => ({ id: p.id || uid(), ...p }));
-      save();
-      render();
-      return true;
-    } catch (e) {
-      console.error('Import failed', e);
-      return false;
-    }
-  },
-  clearAll: () => {
-    if (confirm('Clear all donor data?')) {
-      donors = [];
-      save();
-      render();
-    }
-  }
-};
+/* SEARCH & FILTER */
+$("#search").addEventListener("input",render);
+$("#bloodFilter").addEventListener("change",render);
 
-/* --- Initialize --- */
+/* EXPORT CSV */
+$("#exportBtn").addEventListener("click", ()=>{
+  const rows = [
+    ["Name","Blood","DOB","Age","Phone","Email","Location","Added"],
+    ...donors.map(d=>[
+      d.name,
+      d.bloodGroup,
+      d.dob,
+      computeAge(d.dob),
+      d.phone,
+      d.email,
+      d.location,
+      formatDate(d.addedAt)
+    ])
+  ];
+
+  const csv = rows.map(r=>r.join(",")).join("\n");
+  const blob = new Blob([csv],{type:"text/csv"});
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "donors.csv";
+  a.click();
+});
+
+/* ADD BUTTON + CANCEL BUTTON EVENTS */
+$("#addBtn").addEventListener("click", () => openForm("add"));
+$("#fabAdd").addEventListener("click", () => openForm("add"));
+$("#cancelBtn").addEventListener("click", closeForm);
+
+/* Re-render on resize so layout switches table <-> cards */
+window.addEventListener("resize", render);
+
+/* THEME TOGGLE */
+(function initTheme(){
+  const btn = $("#themeToggle");
+  if (!btn) return;
+  const saved = localStorage.getItem("theme") || "light";
+  document.body.classList.toggle("dark", saved === "dark");
+  btn.textContent = saved === "dark" ? "Light Mode" : "Dark Mode";
+
+  btn.addEventListener("click", ()=>{
+    const isDark = document.body.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    btn.textContent = isDark ? "Light Mode" : "Dark Mode";
+  });
+})();
+
+/* INIT */
 load();
-seedIfEmpty();
-attachRipples();
-bind();
+if (donors.length === 0){
+  donors = [{
+    id: uid(),
+    name:"Sample Donor",
+    bloodGroup:"O+",
+    dob:"2000-01-01",
+    phone:"0000000000",
+    email:"",
+    location:"Eathamozhi",
+    addedAt:new Date().toISOString()
+  }];
+  save();
+}
 render();
