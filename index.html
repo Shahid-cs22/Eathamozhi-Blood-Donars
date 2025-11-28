@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -10,9 +11,12 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600&family=Kavivanar&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600&family=Kavivanar&display=swap"
+    rel="stylesheet">
 
 </head>
+
 <body>
 
   <!-- Header -->
@@ -20,7 +24,7 @@
     <div class="brand">
       <img class="logo" src="./images/Eathamozhi-Jumma-Masjid-new.png" alt="Eathamozhi Logo">
       <div class="brand-text">
-        <h1>Eathamozhi Blood Donors</h1>
+        <h1><a href="https://eathamozhi-masjid.netlify.app/" style="color: whitesmoke; text-decoration: none;">Eathamozhi Blood Donors</a></h1>
         <p class="subtitle">ரஹ்மானியா இளைஞர் மன்றம்</p>
       </div>
     </div>
@@ -46,10 +50,14 @@
         <div class="field">
           <select id="bloodFilter">
             <option value="">All Blood Groups</option>
-            <option>A+</option><option>A-</option>
-            <option>B+</option><option>B-</option>
-            <option>AB+</option><option>AB-</option>
-            <option>O+</option><option>O-</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+            <option>O+</option>
+            <option>O-</option>
           </select>
         </div>
       </div>
@@ -77,10 +85,14 @@
           <label>Blood Group
             <select id="bloodGroup" required>
               <option value="">Select</option>
-              <option>A+</option><option>A-</option>
-              <option>B+</option><option>B-</option>
-              <option>AB+</option><option>AB-</option>
-              <option>O+</option><option>O-</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
             </select>
           </label>
         </div>
@@ -127,7 +139,7 @@
   </main>
 
   <footer class="site-footer">
-    <small>Local Storage Version • Works Offline • Designed for Eathamozhi Community</small>
+    <small>&copy; Eathamozhi <script>document.write(new Date().getFullYear());</script>. All Rights Reserved.</small>
   </footer>
 
   <!-- EmailJS SDK -->
@@ -141,4 +153,5 @@
   <!-- App Logic -->
   <script src="app.js"></script>
 </body>
+
 </html>
