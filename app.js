@@ -308,6 +308,18 @@ if (donors.length === 0) {
     location: "Eathamozhi",
     addedAt: new Date().toISOString()
 
+  },
+  {
+
+    id: uid(),
+    name: "Arshad",
+    bloodGroup: "O+",
+    dob: "2006-01-24",
+    phone: "+91 9150103674",
+    email: "arshadms127@gmail.com",
+    location: "Eathamozhi",
+    addedAt: new Date().toISOString()
+
   }
 ];
   save();
