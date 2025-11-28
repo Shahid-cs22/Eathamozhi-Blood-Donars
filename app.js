@@ -189,6 +189,7 @@ function sendEmail(rec){
     donor_email: rec.email || "Not Provided",
     donor_location: rec.location,
     donor_age: computeAge(rec.dob),
+    donor_dob: rec.dob,                       // <-- added for email template
     added_date: formatDate(rec.addedAt)
   })
   .then(() => alert("📩 Email sent successfully!"))
