@@ -1,4 +1,4 @@
-/* Eathamozhi Blood Donors - Modern Version (Option A) */
+/* Eathamozhi Blood Donors - Modern Version (Option A) + EmailJS */
 
 const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
 const OWNER_KEY   = 'eathamozhi_my_donor_id';
@@ -13,16 +13,17 @@ function load(){
 function save(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(donors));
 }
-function uid(){
-  return "d_" + Math.random().toString(36).slice(2,10);
-}
 
-/* OWNER HELPERS (for edit-only-by-creator) */
+/* OWNER HELPERS */
 function getOwnerId(){
   return localStorage.getItem(OWNER_KEY);
 }
 function setOwnerId(id){
   localStorage.setItem(OWNER_KEY, id);
+}
+
+function uid(){
+  return "d_" + Math.random().toString(36).slice(2,10);
 }
 
 /* AGE */
@@ -36,19 +37,15 @@ function computeAge(dob){
   return age;
 }
 
-/* DATE FORMAT (DD/MM/YYYY) */
+/* DATE FORMAT */
 function formatDate(iso){
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d)) return "";
-  return d.toLocaleDateString("en-GB");
+  return new Date(iso).toLocaleDateString("en-GB");
 }
 
-/* RELATIVE TIME ("2 days ago") */
+/* RELATIVE TIME */
 function relativeTime(dateIso) {
   const now = new Date();
   const past = new Date(dateIso);
-  if (isNaN(past)) return "";
   const seconds = Math.floor((now - past) / 1000);
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
@@ -74,27 +71,19 @@ function render(){
   const sec = $("#listSection");
   sec.innerHTML = "";
 
-  const q = ($("#search")?.value || "").toLowerCase();
-  const bf = $("#bloodFilter")?.value || "";
+  const q = $("#search").value.toLowerCase();
+  const bf = $("#bloodFilter").value;
 
   const filtered = donors.filter(d =>
     (!bf || d.bloodGroup === bf) &&
-    (
-      d.name.toLowerCase().includes(q) ||
-      (d.phone || "").toLowerCase().includes(q) ||
-      (d.location || "").toLowerCase().includes(q)
-    )
+    (d.name.toLowerCase().includes(q) ||
+     d.phone.toLowerCase().includes(q) ||
+     d.location.toLowerCase().includes(q))
   );
 
   const ownerId = getOwnerId();
 
-  /* DESKTOP TABLE */
   if (window.innerWidth > 800){
-    if (!filtered.length){
-      sec.innerHTML = `<p style="text-align:center;color:#6b7280;font-size:0.9rem;">No donors found. Try a different search or add a new donor.</p>`;
-      return;
-    }
-
     const t = document.createElement("table");
     t.className = "table";
     t.innerHTML = `
@@ -105,6 +94,7 @@ function render(){
       </tr></thead>
       <tbody></tbody>
     `;
+
     const body = t.querySelector("tbody");
 
     filtered.forEach(d=>{
@@ -115,16 +105,16 @@ function render(){
         <td>${d.bloodGroup}</td>
         <td>${computeAge(d.dob)}</td>
         <td>${d.phone}</td>
-        <td>${d.location || "—"}</td>
+        <td>${d.location}</td>
         <td>
           ${formatDate(d.addedAt)}<br>
-          <small style="color:#6b7280;">${relativeTime(d.addedAt)}</small>
+          <small>${relativeTime(d.addedAt)}</small>
         </td>
         <td>
           ${
-            canEdit
-              ? `<button class="primary btn-animated" style="padding:6px 10px;font-size:0.75rem;" onclick="openForm('edit','${d.id}')">Edit</button>`
-              : `<span style="font-size:0.75rem;color:#9ca3af;">No access</span>`
+            canEdit 
+            ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
+            : `<span style="color:#999;font-size:12px;">No Access</span>`
           }
         </td>
       `;
@@ -134,13 +124,7 @@ function render(){
     sec.appendChild(t);
   }
 
-  /* MOBILE CARD VIEW */
   else {
-    if (!filtered.length){
-      sec.innerHTML = `<p style="text-align:center;color:#6b7280;font-size:0.9rem;">No donors found. Tap + to add a donor.</p>`;
-      return;
-    }
-
     filtered.forEach(d=>{
       const canEdit = ownerId === d.id;
       const card = document.createElement("div");
@@ -151,7 +135,7 @@ function render(){
           <div class="badge" data-bg="${d.bloodGroup}">${d.bloodGroup}</div>
           <div class="meta-text">
             <strong>${d.name}</strong>
-            <span>${computeAge(d.dob)} yrs • ${d.location || "—"}</span>
+            <span>${computeAge(d.dob)} yrs • ${d.location}</span>
           </div>
         </div>
 
@@ -165,9 +149,9 @@ function render(){
         <div class="card-footer">
           <small>ID: ${d.id}</small>
           ${
-            canEdit
-              ? `<button class="primary btn-animated" style="padding:6px 10px;font-size:0.8rem;" onclick="openForm('edit','${d.id}')">Edit</button>`
-              : `<small style="color:#9ca3af;">View only</small>`
+            canEdit 
+            ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
+            : `<span style="color:#999;font-size:12px;">View Only</span>`
           }
         </div>
       `;
@@ -178,23 +162,20 @@ function render(){
 
 /* OPEN FORM */
 function openForm(mode,id){
-  const drawer = $("#formDrawer");
-  drawer?.setAttribute("aria-hidden","false");
-  $("#donorForm")?.reset();
-  const deleteBtn = $("#deleteBtn");
-  if (deleteBtn){
-    deleteBtn.hidden = true;   // DELETE DISABLED
-    deleteBtn.style.display = "none";
-  }
+  $("#formDrawer").setAttribute("aria-hidden","false");
+  $("#donorForm").reset();
+  $("#deleteBtn").hidden = true;
 
   if (mode === "add"){
     $("#formTitle").textContent = "Add Donor";
     $("#donorId").value = "";
     $("#age").value = "";
-  } else {
+  }
+  else {
     const d = donors.find(x=>x.id===id);
     if (!d) return;
     $("#formTitle").textContent = "Edit Donor";
+
     $("#name").value = d.name;
     $("#bloodGroup").value = d.bloodGroup;
     $("#dob").value = d.dob;
@@ -207,10 +188,29 @@ function openForm(mode,id){
 }
 
 function closeForm(){
-  $("#formDrawer")?.setAttribute("aria-hidden","true");
+  $("#formDrawer").setAttribute("aria-hidden","true");
 }
 
-/* SAVE */
+/* 📧 SEND EMAIL VIA EMAILJS */
+function sendEmail(rec){
+  emailjs.send("blood-eathamozhi", "template_q56xd65", {
+    donor_name: rec.name,
+    donor_blood: rec.bloodGroup,
+    donor_phone: rec.phone,
+    donor_email: rec.email || "Not Provided",
+    donor_location: rec.location,
+    donor_age: computeAge(rec.dob),
+    added_date: formatDate(rec.addedAt)
+  })
+  .then(() => {
+    alert("📩 Email sent successfully!");
+  })
+  .catch(() => {
+    alert("❌ Failed to send email.");
+  });
+}
+
+/* SAVE FORM */
 $("#donorForm").addEventListener("submit", e=>{
   e.preventDefault();
 
@@ -229,16 +229,21 @@ $("#donorForm").addEventListener("submit", e=>{
   };
 
   if (!rec.name || !rec.bloodGroup || !rec.dob || !rec.phone){
-    alert("Please fill all required fields.");
+    alert("Fill all required fields.");
     return;
   }
 
-  if (idx >= 0){
-    donors[idx] = rec;
-  } else {
+  const isNew = idx < 0;
+
+  if (isNew) {
     donors.unshift(rec);
-    // mark this device as the owner of this donor
     setOwnerId(id);
+
+    /* 🔥 Send Email only for new donor */
+    sendEmail(rec);
+  }
+  else {
+    donors[idx] = rec;
   }
 
   save();
@@ -246,24 +251,12 @@ $("#donorForm").addEventListener("submit", e=>{
   render();
 });
 
-/* DELETE REMOVED – stub only */
-function removeDonor(id){
-  console.warn("Delete is disabled.");
-}
-
-/* HIDE DELETE BUTTON IN FORM (defensive) */
-const deleteBtn = $("#deleteBtn");
-if (deleteBtn) {
-  deleteBtn.style.display = "none";
-  deleteBtn.hidden = true;
-}
-
 /* AUTO AGE */
 $("#dob").addEventListener("change",()=>{
   $("#age").value = computeAge($("#dob").value);
 });
 
-/* SEARCH & FILTER */
+/* SEARCH + FILTER */
 $("#search").addEventListener("input",render);
 $("#bloodFilter").addEventListener("change",render);
 
@@ -292,39 +285,23 @@ $("#exportBtn").addEventListener("click", ()=>{
   a.click();
 });
 
-/* ADD BUTTON + CANCEL BUTTON EVENTS */
+/* BUTTONS */
 $("#addBtn").addEventListener("click", () => openForm("add"));
 $("#fabAdd").addEventListener("click", () => openForm("add"));
 $("#cancelBtn").addEventListener("click", closeForm);
 
-/* Re-render on resize so layout switches table <-> cards */
 window.addEventListener("resize", render);
-
-/* THEME TOGGLE */
-(function initTheme(){
-  const btn = $("#themeToggle");
-  if (!btn) return;
-  const saved = localStorage.getItem("theme") || "light";
-  document.body.classList.toggle("dark", saved === "dark");
-  btn.textContent = saved === "dark" ? "Light Mode" : "Dark Mode";
-
-  btn.addEventListener("click", ()=>{
-    const isDark = document.body.classList.toggle("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    btn.textContent = isDark ? "Light Mode" : "Dark Mode";
-  });
-})();
 
 /* INIT */
 load();
 if (donors.length === 0){
   donors = [{
     id: uid(),
-    name:"Mohamed Shahid",
-    bloodGroup:"B+",
-    dob:"2004-06-25",
-    phone:"+91 7339110968",
-    email:"moh.shahid2004@gmail.com",
+    name:"Sample Donor",
+    bloodGroup:"O+",
+    dob:"2000-01-01",
+    phone:"0000000000",
+    email:"",
     location:"Eathamozhi",
     addedAt:new Date().toISOString()
   }];
