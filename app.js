@@ -320,11 +320,11 @@ load();
 if (donors.length === 0){
   donors = [{
     id: uid(),
-    name:"Sample Donor",
-    bloodGroup:"O+",
-    dob:"2000-01-01",
-    phone:"0000000000",
-    email:"",
+    name:"Mohamed Shahid",
+    bloodGroup:"B+",
+    dob:"2004-06-25",
+    phone:"+91 7339110968",
+    email:"moh.shahid2004@gmail.com",
     location:"Eathamozhi",
     addedAt:new Date().toISOString()
   }];
