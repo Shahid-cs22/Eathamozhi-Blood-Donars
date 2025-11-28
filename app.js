@@ -320,6 +320,18 @@ if (donors.length === 0) {
     location: "Eathamozhi",
     addedAt: new Date().toISOString()
 
+  },
+  {
+
+    id: uid(),
+    name: "Anwar Raja",
+    bloodGroup: "B+",
+    dob: "2003-01-05",
+    phone: "+91 9655893210",
+    email: "anwarshazz20@gmail.com",
+    location: "Kottar",
+    addedAt: new Date().toISOString()
+
   }
 ];
   save();
