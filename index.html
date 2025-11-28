@@ -15,7 +15,7 @@
 </head>
 <body>
 
-  <!-- Top header -->
+  <!-- Header -->
   <header class="site-header">
     <div class="brand">
       <img class="logo" src="./images/Eathamozhi-Jumma-Masjid-new.png" alt="Eathamozhi Logo">
@@ -58,7 +58,7 @@
     <!-- Donor List -->
     <section id="listSection" class="list-section"></section>
 
-    <!-- Drawer Form -->
+    <!-- Form Drawer -->
     <aside id="formDrawer" class="drawer" aria-hidden="true">
       <form id="donorForm" class="donor-form">
         <header class="form-head">
@@ -111,7 +111,6 @@
 
         <div class="form-actions">
           <button type="submit" class="primary btn-animated">Save</button>
-          <button type="button" id="deleteBtn" class="danger" hidden>Delete</button>
         </div>
 
         <p class="hint-text">
@@ -122,7 +121,7 @@
       </form>
     </aside>
 
-    <!-- Floating Add Button (mobile) -->
+    <!-- Mobile FAB -->
     <button id="fabAdd" class="fab" aria-label="Add donor">+</button>
 
   </main>
@@ -131,6 +130,15 @@
     <small>Local Storage Version • Works Offline • Designed for Eathamozhi Community</small>
   </footer>
 
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init("Uj5t9Er9dmO3ZDDBy"); // Public Key
+    })();
+  </script>
+
+  <!-- App Logic -->
   <script src="app.js"></script>
 </body>
 </html>

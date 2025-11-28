@@ -1,4 +1,4 @@
-/* Eathamozhi Blood Donors - Modern Version (Option A) + EmailJS */
+/* Eathamozhi Blood Donors - Final Fixed Version */
 
 const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
 const OWNER_KEY   = 'eathamozhi_my_donor_id';
@@ -6,7 +6,7 @@ const OWNER_KEY   = 'eathamozhi_my_donor_id';
 let donors = [];
 const $ = (s) => document.querySelector(s);
 
-/* Load + Save */
+/* LOAD & SAVE */
 function load(){
   donors = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 }
@@ -14,17 +14,11 @@ function save(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(donors));
 }
 
-/* OWNER HELPERS */
-function getOwnerId(){
-  return localStorage.getItem(OWNER_KEY);
-}
-function setOwnerId(id){
-  localStorage.setItem(OWNER_KEY, id);
-}
+/* OWNER HELP */
+function getOwnerId(){ return localStorage.getItem(OWNER_KEY); }
+function setOwnerId(id){ localStorage.setItem(OWNER_KEY, id); }
 
-function uid(){
-  return "d_" + Math.random().toString(36).slice(2,10);
-}
+function uid(){ return "d_" + Math.random().toString(36).slice(2,10); }
 
 /* AGE */
 function computeAge(dob){
@@ -38,9 +32,7 @@ function computeAge(dob){
 }
 
 /* DATE FORMAT */
-function formatDate(iso){
-  return new Date(iso).toLocaleDateString("en-GB");
-}
+function formatDate(iso){ return new Date(iso).toLocaleDateString("en-GB"); }
 
 /* RELATIVE TIME */
 function relativeTime(dateIso) {
@@ -50,13 +42,8 @@ function relativeTime(dateIso) {
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   const intervals = {
-    year: 31536000,
-    month: 2592000,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60,
-    second: 1
+    year: 31536000, month: 2592000, week: 604800,
+    day: 86400, hour: 3600, minute: 60, second: 1
   };
 
   for (const key in intervals) {
@@ -83,6 +70,7 @@ function render(){
 
   const ownerId = getOwnerId();
 
+  /* Desktop table */
   if (window.innerWidth > 800){
     const t = document.createElement("table");
     t.className = "table";
@@ -97,7 +85,7 @@ function render(){
 
     const body = t.querySelector("tbody");
 
-    filtered.forEach(d=>{
+    filtered.forEach(d => {
       const canEdit = ownerId === d.id;
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -111,11 +99,9 @@ function render(){
           <small>${relativeTime(d.addedAt)}</small>
         </td>
         <td>
-          ${
-            canEdit 
+          ${canEdit 
             ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-            : `<span style="color:#999;font-size:12px;">No Access</span>`
-          }
+            : `<span style="color:#999;font-size:12px;">No Access</span>`}
         </td>
       `;
       body.appendChild(tr);
@@ -124,6 +110,7 @@ function render(){
     sec.appendChild(t);
   }
 
+  /* Mobile cards */
   else {
     filtered.forEach(d=>{
       const canEdit = ownerId === d.id;
@@ -148,11 +135,9 @@ function render(){
 
         <div class="card-footer">
           <small>ID: ${d.id}</small>
-          ${
-            canEdit 
+          ${canEdit 
             ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-            : `<span style="color:#999;font-size:12px;">View Only</span>`
-          }
+            : `<span style="color:#999;font-size:12px;">View Only</span>`}
         </div>
       `;
       sec.appendChild(card);
@@ -164,7 +149,6 @@ function render(){
 function openForm(mode,id){
   $("#formDrawer").setAttribute("aria-hidden","false");
   $("#donorForm").reset();
-  $("#deleteBtn").hidden = true;
 
   if (mode === "add"){
     $("#formTitle").textContent = "Add Donor";
@@ -191,8 +175,13 @@ function closeForm(){
   $("#formDrawer").setAttribute("aria-hidden","true");
 }
 
-/* 📧 SEND EMAIL VIA EMAILJS */
+/* EMAILJS SEND */
 function sendEmail(rec){
+  if (!window.emailjs || !emailjs.send){
+    console.warn("EmailJS unavailable — skipping email.");
+    return;
+  }
+
   emailjs.send("blood-eathamozhi", "template_q56xd65", {
     donor_name: rec.name,
     donor_blood: rec.bloodGroup,
@@ -202,10 +191,9 @@ function sendEmail(rec){
     donor_age: computeAge(rec.dob),
     added_date: formatDate(rec.addedAt)
   })
-  .then(() => {
-    alert("📩 Email sent successfully!");
-  })
-  .catch(() => {
+  .then(() => alert("📩 Email sent successfully!"))
+  .catch(err => {
+    console.error(err);
     alert("❌ Failed to send email.");
   });
 }
@@ -238,13 +226,9 @@ $("#donorForm").addEventListener("submit", e=>{
   if (isNew) {
     donors.unshift(rec);
     setOwnerId(id);
-
-    /* 🔥 Send Email only for new donor */
     sendEmail(rec);
   }
-  else {
-    donors[idx] = rec;
-  }
+  else donors[idx] = rec;
 
   save();
   closeForm();
@@ -289,6 +273,13 @@ $("#exportBtn").addEventListener("click", ()=>{
 $("#addBtn").addEventListener("click", () => openForm("add"));
 $("#fabAdd").addEventListener("click", () => openForm("add"));
 $("#cancelBtn").addEventListener("click", closeForm);
+
+/* THEME TOGGLE */
+$("#themeToggle").addEventListener("click",()=>{
+  document.body.classList.toggle("dark");
+  $("#themeToggle").textContent =
+    document.body.classList.contains("dark") ? "Light Mode" : "Dark Mode";
+});
 
 window.addEventListener("resize", render);
 
