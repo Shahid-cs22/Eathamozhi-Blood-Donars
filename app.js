@@ -1,4 +1,4 @@
-/* Eathamozhi Blood Donors - Final Fixed Version */
+/* Eathamozhi Blood Donors - Final Verified Version */
 
 const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
 const OWNER_KEY   = 'eathamozhi_my_donor_id';
@@ -175,7 +175,7 @@ function closeForm(){
   $("#formDrawer").setAttribute("aria-hidden","true");
 }
 
-/* EMAILJS SEND */
+/* EMAILJS SEND (CONFIGURED WITH YOUR KEYS) */
 function sendEmail(rec){
   if (!window.emailjs || !emailjs.send){
     console.warn("EmailJS unavailable — skipping email.");
@@ -189,7 +189,7 @@ function sendEmail(rec){
     donor_email: rec.email || "Not Provided",
     donor_location: rec.location,
     donor_age: computeAge(rec.dob),
-    donor_dob: rec.dob,                       // <-- added for email template
+    donor_dob: rec.dob,
     added_date: formatDate(rec.addedAt)
   })
   .then(() => alert("📩 Email sent successfully!"))
