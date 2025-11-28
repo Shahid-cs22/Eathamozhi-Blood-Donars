@@ -295,7 +295,7 @@ if (donors.length === 0) {
     phone: "+91 7339110968",
     email: "moh.shahid2004@gmail.com",
     location: "Eathamozhi",
-    addedAt: new Date().toISOString()
+    addedAt: new Date()
   },
   {
 
