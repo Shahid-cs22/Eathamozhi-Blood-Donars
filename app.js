@@ -39,6 +39,7 @@ function relativeTime(dateIso) {
   const now = new Date();
   const past = new Date(dateIso);
   const seconds = Math.floor((now - past) / 1000);
+
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   const intervals = {
@@ -95,7 +96,6 @@ function render() {
         <td>${d.phone}</td>
         <td>${d.location}</td>
         <td>
-          ${formatDate(d.addedAt)}<br>
           <small>${relativeTime(d.addedAt)}</small>
         </td>
         <td>
@@ -129,8 +129,7 @@ function render() {
         <div class="card-info-line">
           <strong>Phone:</strong> ${d.phone}<br>
           <strong>Email:</strong> ${d.email || "—"}<br>
-          <strong>Added:</strong> ${formatDate(d.addedAt)}
-          <small>(${relativeTime(d.addedAt)})</small>
+          <strong>Added:</strong> <small>${relativeTime(d.addedAt)}</small>
         </div>
 
         <div class="card-footer">
@@ -158,8 +157,8 @@ function openForm(mode, id) {
   else {
     const d = donors.find(x => x.id === id);
     if (!d) return;
-    $("#formTitle").textContent = "Edit Donor";
 
+    $("#formTitle").textContent = "Edit Donor";
     $("#name").value = d.name;
     $("#bloodGroup").value = d.bloodGroup;
     $("#dob").value = d.dob;
@@ -175,12 +174,9 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
-/* EMAILJS SEND (CONFIGURED WITH YOUR KEYS) */
+/* SEND EMAIL (EmailJS) */
 function sendEmail(rec) {
-  if (!window.emailjs || !emailjs.send) {
-    console.warn("EmailJS unavailable — skipping email.");
-    return;
-  }
+  if (!window.emailjs || !emailjs.send) return;
 
   emailjs.send("blood-eathamozhi", "template_q56xd65", {
     donor_name: rec.name,
@@ -190,13 +186,7 @@ function sendEmail(rec) {
     donor_location: rec.location,
     donor_age: computeAge(rec.dob),
     donor_dob: rec.dob,
-    added_date: formatDate(rec.addedAt)
-  })
-    .then(() => alert("📩 Email sent successfully!"))
-    .catch(err => {
-      console.error(err);
-      alert("❌ Failed to send email.");
-    });
+  });
 }
 
 /* SAVE FORM */
@@ -228,8 +218,9 @@ $("#donorForm").addEventListener("submit", e => {
     donors.unshift(rec);
     setOwnerId(id);
     sendEmail(rec);
+  } else {
+    donors[idx] = rec;
   }
-  else donors[idx] = rec;
 
   save();
   closeForm();
@@ -257,7 +248,7 @@ $("#exportBtn").addEventListener("click", () => {
       d.phone,
       d.email,
       d.location,
-      formatDate(d.addedAt)
+      relativeTime(d.addedAt)
     ])
   ];
 
@@ -275,7 +266,7 @@ $("#addBtn").addEventListener("click", () => openForm("add"));
 $("#fabAdd").addEventListener("click", () => openForm("add"));
 $("#cancelBtn").addEventListener("click", closeForm);
 
-/* THEME TOGGLE */
+/* THEME */
 $("#themeToggle").addEventListener("click", () => {
   document.body.classList.toggle("dark");
   $("#themeToggle").textContent =
@@ -284,68 +275,64 @@ $("#themeToggle").addEventListener("click", () => {
 
 window.addEventListener("resize", render);
 
-/* INIT */
+/* INIT + DEFAULT DATA */
 load();
+
 if (donors.length === 0) {
-  donors = [{
-    id: uid(),
-    name: "Mohamed Shahid",
-    bloodGroup: "B+",
-    dob: "2004-06-25",
-    phone: "+91 7339110968",
-    email: "moh.shahid2004@gmail.com",
-    location: "Eathamozhi",
-    addedAt: new Date()
-  },
-  {
+  donors = [
+    {
+      id: uid(),
+      name: "Mohamed Shahid",
+      bloodGroup: "B+",
+      dob: "2004-06-25",
+      phone: "+91 7339110968",
+      email: "moh.shahid2004@gmail.com",
+      location: "Eathamozhi",
+      addedAt: new Date("2025-11-28").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Mohamed Rashid",
+      bloodGroup: "O+",
+      dob: "2006-12-17",
+      phone: "+91 9597380685",
+      email: "moh.rashid20006@gmail.com",
+      location: "Eathamozhi",
+      addedAt: new Date("2025-11-28").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Arshad",
+      bloodGroup: "O+",
+      dob: "2006-01-24",
+      phone: "+91 9150103674",
+      email: "arshadms127@gmail.com",
+      location: "Eathamozhi",
+      addedAt: new Date("2025-11-28").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Anwar Raja",
+      bloodGroup: "B+",
+      dob: "2003-01-05",
+      phone: "+91 9655893210",
+      email: "anwarshazz20@gmail.com",
+      location: "Kottar",
+      addedAt: new Date("2025-11-29").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Mohammed Irfan",
+      bloodGroup: "O-",
+      dob: "2004-11-18",
+      phone: "+91 9360533520",
+      email: "irfanirfan2w@gmail.com",
+      location: "Kottar",
+     addedAt: new Date("2025-11-29").toISOString()
+    }
+  ];
 
-    id: uid(),
-    name: "Mohamed Rashid",
-    bloodGroup: "O+",
-    dob: "2006-12-17",
-    phone: "+91 9597380685",
-    email: "moh.rashid20006@gmail.com",
-    location: "Eathamozhi",
-    addedAt: new Date().toISOString()
-
-  },
-  {
-
-    id: uid(),
-    name: "Arshad",
-    bloodGroup: "O+",
-    dob: "2006-01-24",
-    phone: "+91 9150103674",
-    email: "arshadms127@gmail.com",
-    location: "Eathamozhi",
-    addedAt: new Date().toISOString()
-
-  },
-  {
-
-    id: uid(),
-    name: "Anwar Raja",
-    bloodGroup: "B+",
-    dob: "2003-01-05",
-    phone: "+91 9655893210",
-    email: "anwarshazz20@gmail.com",
-    location: "Kottar",
-    addedAt: new Date().toISOString()
-  },
-  {
-
-    id: uid(),
-    name: "Mohammed Irfan",
-    bloodGroup: "O-",
-    dob: "2004-11-18",
-    phone: "+91 9655893210",
-    email: "irfanirfan2w@gmail.com",
-    location: "Kottar",
-    addedAt: new Date().toISOString()
-
-  }
-
-];
   save();
 }
+
 render();
