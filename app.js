@@ -288,7 +288,7 @@ if (donors.length === 0) {
       phone: "+91 7339110968",
       email: "moh.shahid2004@gmail.com",
       location: "Eathamozhi",
-      addedAt: new Date("2025-11-28").toISOString()
+      addedAt: new Date("2025-11-27").toISOString()
     },
     {
       id: uid(),
@@ -347,7 +347,7 @@ if (donors.length === 0) {
       dob: "2005-10-28",
       phone: "+91 8825872266",
       email: "-",
-      location: "Eathamozhi/Nahercoil",
+      location: "Eathamozhi/Nagercoil",
       addedAt: new Date("2025-11-29").toISOString()
     }
   ];
