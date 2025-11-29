@@ -292,16 +292,6 @@ if (donors.length === 0) {
     },
     {
       id: uid(),
-      name: "Mohamed Rashid",
-      bloodGroup: "O+",
-      dob: "2006-12-17",
-      phone: "+91 9597380685",
-      email: "moh.rashid20006@gmail.com",
-      location: "Eathamozhi",
-      addedAt: new Date("2025-11-28").toISOString()
-    },
-    {
-      id: uid(),
       name: "Arshad",
       bloodGroup: "O+",
       dob: "2006-01-24",
@@ -319,6 +309,16 @@ if (donors.length === 0) {
       email: "anwarshazz20@gmail.com",
       location: "Kottar",
       addedAt: new Date("2025-11-29").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Mohamed Rashid",
+      bloodGroup: "O+",
+      dob: "2006-12-17",
+      phone: "+91 9597380685",
+      email: "moh.rashid20006@gmail.com",
+      location: "Eathamozhi",
+      addedAt: new Date("2025-11-28").toISOString()
     },
     {
       id: uid(),
