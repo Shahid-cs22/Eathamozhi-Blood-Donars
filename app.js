@@ -346,8 +346,18 @@ if (donors.length === 0) {
       bloodGroup: "A+",
       dob: "2005-10-28",
       phone: "+91 8825872266",
-      email: "-",
+      email: "Not Provided",
       location: "Eathamozhi/Nagercoil",
+      addedAt: new Date("2025-11-29").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Sugendhiram",
+      bloodGroup: "AB+",
+      dob: "1991-10-28",
+      phone: "+91 9524758714",
+      email: "sugendraniee@gmail.com",
+      location: "Eathamozhy",
       addedAt: new Date("2025-11-29").toISOString()
     }
   ];
