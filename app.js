@@ -359,6 +359,16 @@ if (donors.length === 0) {
       email: "sugendraniee@gmail.com",
       location: "Eathamozhy",
       addedAt: new Date("2025-11-29").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Aswin",
+      bloodGroup: "O+",
+      dob: "2006-05-08",
+      phone: "+91 7708702053",
+      email: "aswinchellathurai@gmail.com",
+      location: "Dharmapuram",
+      addedAt: new Date("2025-11-29").toISOString()
     }
   ];
 
