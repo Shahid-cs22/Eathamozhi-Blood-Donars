@@ -399,6 +399,16 @@ if (donors.length === 0) {
       email: "sivanrocky999@gmail.com",
       location: "Kottar/ Nagarcoil",
       addedAt: new Date("2025-11-30").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Jakkulin Britto",
+      bloodGroup: "B+",
+      dob: "2003-09-27",
+      phone: "+91 8870581052",
+      email: "Not Provided",
+      location: "Monday Market",
+      addedAt: new Date("2025-11-30").toISOString()
     }
   ];
 
