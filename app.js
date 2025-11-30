@@ -458,7 +458,17 @@ if (donors.length === 0) {
       phone: "+91 9345639491",
       email: "esthakyesthaky427@gmail.com",
       location: "Kadiyapattanam",
-      addedAt: new Date("2025-11-30").toISOString() //17
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Shaheed H",
+      bloodGroup: "O+",
+      dob: "2004-06-09",
+      phone: "+91 7418073299",
+      email: "Not Provided",
+      location: "Eathamozhi",
+      addedAt: new Date("2025-11-30").toISOString() //18
     }
   ];
 
