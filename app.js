@@ -347,7 +347,7 @@ if (donors.length === 0) {
       dob: "2005-10-28",
       phone: "+91 8825872266",
       email: "Not Provided",
-      location: "Eathamozhi/ Nagercoil",
+      location: "Eathamozhi-Nagercoil",
       addedAt: new Date("2025-11-29").toISOString()
     },
     {
@@ -387,7 +387,7 @@ if (donors.length === 0) {
       dob: "2004-12-25",
       phone: "+91 9344196172",
       email: "jersonjl127@gmail.com",
-      location: "Vethanagar/ Nagarcoil",
+      location: "Vethanagar",
       addedAt: new Date("2025-11-30").toISOString()
     },
     {
@@ -432,12 +432,22 @@ if (donors.length === 0) {
     },
     {
       id: uid(),
-      name: "Jude sharuk",
+      name: "Jude Sharuk",
       bloodGroup: "O+",
       dob: "2004-08-04",
       phone: "+91 9940253935",
       email: "judesharuckjude@gmail.com",
       location: "Muttom",
+      addedAt: new Date("2025-11-30").toISOString() //16
+    },
+    {
+      id: uid(),
+      name: "Majeed Alsaifullah",
+      bloodGroup: "AB+",
+      dob: "2006-04-30",
+      phone: "+91 9345556281",
+      email: "Not Provided",
+      location: "Kanyakumari",
       addedAt: new Date("2025-11-30").toISOString() //16
     }
   ];
