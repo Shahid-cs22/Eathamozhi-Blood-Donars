@@ -478,7 +478,27 @@ if (donors.length === 0) {
       phone: "+91 6379170932",
       email: "sabarishtheroor@gmail.com",
       location: "Nagercoil",
-      addedAt: new Date("2025-11-30").toISOString() //19
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Anu Prem",
+      bloodGroup: "O+",
+      dob: "2005-03-16",
+      phone: "+91 9344717272",
+      email: "anupremj@gmail.com",
+      location: "Nagercoil",
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Abishek T",
+      bloodGroup: "B+",
+      dob: "2004-03-09",
+      phone: "+91 6381192131",
+      email: "abishekk7432@gmail.com",
+      location: "Erumbukadu-Nagercoil",
+      addedAt: new Date("2025-11-30").toISOString() //22
     }
   ];
 
