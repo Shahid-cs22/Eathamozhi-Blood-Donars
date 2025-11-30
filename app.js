@@ -498,7 +498,17 @@ if (donors.length === 0) {
       phone: "+91 6381192131",
       email: "abishekk7432@gmail.com",
       location: "Erumbukadu-Nagercoil",
-      addedAt: new Date("2025-11-30").toISOString() //22
+      addedAt: new Date("2025-11-30").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Thishon M",
+      bloodGroup: "B-",
+      dob: "2004-09-26",
+      phone: "+91 7418061816",
+      email: "thishon5746@gmail.com",
+      location: "Koilvilai-Nagercoil",
+      addedAt: new Date("2025-11-30").toISOString() //23
     }
   ];
 
