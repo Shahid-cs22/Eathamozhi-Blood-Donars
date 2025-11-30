@@ -409,6 +409,16 @@ if (donors.length === 0) {
       email: "Not Provided",
       location: "Monday Market",
       addedAt: new Date("2025-11-30").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Sagoboo",
+      bloodGroup: "A+",
+      dob: "2005-01-22",
+      phone: "+91 8248752802",
+      email: "sagoboo2005@gmail.com",
+      location: "Rajakkamangalam Thurai",
+      addedAt: new Date("2025-11-30").toISOString()
     }
   ];
 
