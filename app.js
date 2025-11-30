@@ -389,6 +389,16 @@ if (donors.length === 0) {
       email: "jersonjl127@gmail.com",
       location: "Vethanagar/ Nagarcoil",
       addedAt: new Date("2025-11-30").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Sivan R",
+      bloodGroup: "B+",
+      dob: "2004-09-03",
+      phone: "+91 7708292434",
+      email: "sivanrocky999@gmail.com",
+      location: "Kottar/ Nagarcoil",
+      addedAt: new Date("2025-11-30").toISOString()
     }
   ];
 
