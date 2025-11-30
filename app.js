@@ -347,7 +347,7 @@ if (donors.length === 0) {
       dob: "2005-10-28",
       phone: "+91 8825872266",
       email: "Not Provided",
-      location: "Eathamozhi/Nagercoil",
+      location: "Eathamozhi/ Nagercoil",
       addedAt: new Date("2025-11-29").toISOString()
     },
     {
@@ -378,6 +378,16 @@ if (donors.length === 0) {
       phone: "+91 7550341718",
       email: "mohdsaheen92@gmail.com",
       location: "Thiruvithancode",
+      addedAt: new Date("2025-11-30").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Jerson",
+      bloodGroup: "O+",
+      dob: "2004-12-25",
+      phone: "+91 9344196172",
+      email: "jersonjl127@gmail.com",
+      location: "Vethanagar/ Nagarcoil",
       addedAt: new Date("2025-11-30").toISOString()
     }
   ];
