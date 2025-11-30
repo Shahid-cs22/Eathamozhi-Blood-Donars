@@ -428,7 +428,17 @@ if (donors.length === 0) {
       phone: "+91 7418752951",
       email: "ajai99541@gmail.com",
       location: "Thikkanamcode",
-      addedAt: new Date("2025-11-30").toISOString() //14
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Jude sharuk",
+      bloodGroup: "O+",
+      dob: "2004-08-04",
+      phone: "+91 9940253935",
+      email: "judesharuckjude@gmail.com",
+      location: "Muttom",
+      addedAt: new Date("2025-11-30").toISOString() //16
     }
   ];
 
