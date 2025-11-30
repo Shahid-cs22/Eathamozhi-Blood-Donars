@@ -438,7 +438,7 @@ if (donors.length === 0) {
       phone: "+91 9940253935",
       email: "judesharuckjude@gmail.com",
       location: "Muttom",
-      addedAt: new Date("2025-11-30").toISOString() //16
+      addedAt: new Date("2025-11-30").toISOString() 
     },
     {
       id: uid(),
@@ -448,7 +448,17 @@ if (donors.length === 0) {
       phone: "+91 9345556281",
       email: "Not Provided",
       location: "Kanyakumari",
-      addedAt: new Date("2025-11-30").toISOString() //16
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Nishan",
+      bloodGroup: "AB+",
+      dob: "2004-05-22",
+      phone: "+91 9345639491",
+      email: "esthakyesthaky427@gmail.com",
+      location: "Kadiyapattanam",
+      addedAt: new Date("2025-11-30").toISOString() //17
     }
   ];
 
