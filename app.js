@@ -464,11 +464,21 @@ if (donors.length === 0) {
       id: uid(),
       name: "Shaheed H",
       bloodGroup: "O+",
-      dob: "2004-06-09",
+      dob: "2004-06-08",
       phone: "+91 7418073299",
       email: "Not Provided",
       location: "Eathamozhi",
-      addedAt: new Date("2025-11-30").toISOString() //18
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Boothalingam",
+      bloodGroup: "A+",
+      dob: "1999-07-23",
+      phone: "+91 6379170932",
+      email: "sabarishtheroor@gmail.com",
+      location: "Nagercoil",
+      addedAt: new Date("2025-11-30").toISOString() //19
     }
   ];
 
