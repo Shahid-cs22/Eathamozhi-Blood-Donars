@@ -418,7 +418,17 @@ if (donors.length === 0) {
       phone: "+91 8248752802",
       email: "sagoboo2005@gmail.com",
       location: "Rajakkamangalam Thurai",
-      addedAt: new Date("2025-11-30").toISOString() //13
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Ajai Kumar",
+      bloodGroup: "A2B+",
+      dob: "2005-07-17",
+      phone: "+91 7418752951",
+      email: "ajai99541@gmail.com",
+      location: "Thikkanamcode",
+      addedAt: new Date("2025-11-30").toISOString() //14
     }
   ];
 
