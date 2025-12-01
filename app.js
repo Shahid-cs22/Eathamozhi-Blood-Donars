@@ -310,7 +310,7 @@ $("#themeToggle").addEventListener("click", () => {
 window.addEventListener("resize", render);
 
 /* INIT + DEFAULT DATA */
-load();
+// load();
 
 // Default seed data only on very first visit (local empty)
 if (donors.length === 0) {
@@ -581,7 +581,7 @@ if (donors.length === 0) {
 }
 
 // First render whatever we have locally
-// render();
+render();
 
 // Then sync with Firebase to load previous donors (online)
 startFirebaseSync();
