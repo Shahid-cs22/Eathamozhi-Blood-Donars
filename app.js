@@ -574,6 +574,16 @@ if (donors.length === 0) {
       email: "Not Provided",
       location: "Kadiyapattanam",
       addedAt: new Date("2025-12-01").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Ragul R",
+      bloodGroup: "A+",
+      dob: "2004-03-18",
+      phone: "+91 6383779166",
+      email: "ramarragul72@gmail.com",
+      location: "Ganapathipuram",
+      addedAt: new Date("2025-12-01").toISOString()
     }
   ];
 
