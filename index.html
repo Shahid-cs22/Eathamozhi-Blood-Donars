@@ -5,6 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Nagercoil Blood Donors</title>
+
   <link rel="icon" href="./images/blood.jpeg" sizes="16x16" type="image/png">
   <link rel="stylesheet" href="styles.css" />
 
@@ -18,11 +19,9 @@
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="Nagercoil Blood Donors">
   <meta property="og:description" content="Join us in saving lives. Find blood donors or register as a donor today.">
-
   <meta property="og:image" content="https://eathamozhi-blood-donars.netlify.app/images/donationlog.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-
   <meta property="og:url" content="https://eathamozhi-blood-donars.netlify.app/">
   <meta property="og:type" content="website">
 </head>
@@ -155,12 +154,34 @@
     </small>
   </footer>
 
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    (function () {
-      emailjs.init("Uj5t9Er9dmO3ZDDBy"); // Public Key
-    })();
+  <!-- Firebase SDK (Module) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD7ghZU326LTy6VvF1nU68kvayQ2m2FPJM",
+      authDomain: "blood-donar-32c63.firebaseapp.com",
+      databaseURL: "https://blood-donar-32c63-default-rtdb.firebaseio.com",
+      projectId: "blood-donar-32c63",
+      storageBucket: "blood-donar-32c63.firebasestorage.app",
+      messagingSenderId: "1081719415482",
+      appId: "1:1081719415482:web:7281d504875ba440ed1883",
+      measurementId: "G-MWB2MQ6225"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    getAnalytics(app);
+
+    const db = getDatabase(app);
+
+    // Expose to app.js
+    window._firebase = {
+      db,
+      ref,
+      set
+    };
   </script>
 
   <!-- App Logic -->

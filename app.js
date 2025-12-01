@@ -1,4 +1,4 @@
-/* Eathamozhi Blood Donors - Final Verified Version */
+/* Eathamozhi / Nagercoil Blood Donors - Final Version with Firebase */
 
 const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
 const OWNER_KEY = 'eathamozhi_my_donor_id';
@@ -6,7 +6,7 @@ const OWNER_KEY = 'eathamozhi_my_donor_id';
 let donors = [];
 const $ = (s) => document.querySelector(s);
 
-/* LOAD & SAVE */
+/* LOAD & SAVE (LocalStorage) */
 function load() {
   donors = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 }
@@ -31,7 +31,7 @@ function computeAge(dob) {
   return age;
 }
 
-/* DATE FORMAT */
+/* DATE FORMAT (unused but handy) */
 function formatDate(iso) { return new Date(iso).toLocaleDateString("en-GB"); }
 
 /* RELATIVE TIME */
@@ -164,7 +164,7 @@ function openForm(mode, id) {
     $("#dob").value = d.dob;
     $("#age").value = computeAge(d.dob);
     $("#phone").value = d.phone;
-    $("#email").value = d.email;
+    $("#email").value = d.email === "Not Provided" ? "" : d.email;
     $("#location").value = d.location;
     $("#donorId").value = d.id;
   }
@@ -174,18 +174,18 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
-/* SEND EMAIL (EmailJS) */
+/* SAVE TO FIREBASE (instead of EmailJS) */
 function sendEmail(rec) {
-  if (!window.emailjs || !emailjs.send) return;
+  // This function now syncs to Firebase Realtime Database
+  if (!window._firebase) return; // Firebase not ready
 
-  emailjs.send("blood-eathamozhi", "template_q56xd65", {
-    donor_name: rec.name,
-    donor_blood: rec.bloodGroup,
-    donor_phone: rec.phone,
-    donor_email: rec.email || "Not Provided",
-    donor_location: rec.location,
-    donor_age: computeAge(rec.dob),
-    donor_dob: rec.dob,
+  const { db, ref, set } = window._firebase;
+  const donorRef = ref(db, "donors/" + rec.id);
+
+  set(donorRef, rec).catch(err => {
+    console.error("Error saving donor to Firebase:", err);
+    // Optional: show a toast / alert
+    // alert("Could not save to online database, but saved on this device.");
   });
 }
 
@@ -202,7 +202,7 @@ $("#donorForm").addEventListener("submit", e => {
     bloodGroup: $("#bloodGroup").value,
     dob: $("#dob").value,
     phone: $("#phone").value.trim(),
-    email: $("#email").value.trim(),
+    email: ($("#email").value.trim() || "Not Provided"),
     location: $("#location").value.trim(),
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
   };
@@ -217,12 +217,16 @@ $("#donorForm").addEventListener("submit", e => {
   if (isNew) {
     donors.unshift(rec);
     setOwnerId(id);
-    sendEmail(rec);
   } else {
     donors[idx] = rec;
   }
 
+  // Local save
   save();
+
+  // Online save
+  sendEmail(rec);
+
   closeForm();
   render();
 });
@@ -418,7 +422,7 @@ if (donors.length === 0) {
       phone: "+91 8248752802",
       email: "sagoboo2005@gmail.com",
       location: "Rajakkamangalam Thurai",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -428,7 +432,7 @@ if (donors.length === 0) {
       phone: "+91 7418752951",
       email: "ajai99541@gmail.com",
       location: "Thikkanamcode",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -438,7 +442,7 @@ if (donors.length === 0) {
       phone: "+91 9940253935",
       email: "judesharuckjude@gmail.com",
       location: "Muttom",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -448,7 +452,7 @@ if (donors.length === 0) {
       phone: "+91 9345556281",
       email: "Not Provided",
       location: "Kanyakumari",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -458,7 +462,7 @@ if (donors.length === 0) {
       phone: "+91 9345639491",
       email: "esthakyesthaky427@gmail.com",
       location: "Kadiyapattanam",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -468,7 +472,7 @@ if (donors.length === 0) {
       phone: "+91 7418073299",
       email: "Not Provided",
       location: "Eathamozhi",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -478,7 +482,7 @@ if (donors.length === 0) {
       phone: "+91 6379170932",
       email: "sabarishtheroor@gmail.com",
       location: "Nagercoil",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -488,7 +492,7 @@ if (donors.length === 0) {
       phone: "+91 9344717272",
       email: "anupremj@gmail.com",
       location: "Nagercoil",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -508,7 +512,7 @@ if (donors.length === 0) {
       phone: "+91 7418061816",
       email: "thishon5746@gmail.com",
       location: "Koilvilai-Nagercoil",
-      addedAt: new Date("2025-11-30").toISOString() 
+      addedAt: new Date("2025-11-30").toISOString()
     },
     {
       id: uid(),
@@ -528,7 +532,7 @@ if (donors.length === 0) {
       phone: "+91 7395918325",
       email: "Not Provided",
       location: "Thuckalay",
-      addedAt: new Date("2025-12-01").toISOString() 
+      addedAt: new Date("2025-12-01").toISOString()
     },
     {
       id: uid(),
@@ -538,7 +542,7 @@ if (donors.length === 0) {
       phone: "+91 6385732349",
       email: "Not Provided",
       location: "Kadiyapattanam",
-      addedAt: new Date("2025-12-01").toISOString() //26
+      addedAt: new Date("2025-12-01").toISOString()
     }
   ];
 
