@@ -31,7 +31,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="brand">
-      <img class="logo" src="./images/donationlog.jpg" alt="Eathamozhi Logo">
+      <img class="logo" src="./images/donationlog.jpg" alt="Nagercoil Blood Donors Logo">
       <div class="brand-text">
         <h1><a href="#" style="color: whitesmoke; text-decoration: none;">Nagercoil Blood Donors</a></h1>
         <p class="subtitle">அவசர இரத்த தான சேவையில் இணைந்ததற்கு நன்றி.</p>
@@ -158,7 +158,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD7ghZU326LTy6VvF1nU68kvayQ2m2FPJM",
@@ -180,7 +180,8 @@
     window._firebase = {
       db,
       ref,
-      set
+      set,
+      onValue
     };
   </script>
 

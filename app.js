@@ -1,4 +1,4 @@
-/* Eathamozhi / Nagercoil Blood Donors - Final Version with Firebase */
+/* Nagercoil / Eathamozhi Blood Donors - Final Version with Firebase */
 
 const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
 const OWNER_KEY = 'eathamozhi_my_donor_id';
@@ -57,16 +57,19 @@ function relativeTime(dateIso) {
 /* RENDER LIST */
 function render() {
   const sec = $("#listSection");
+  if (!sec) return;
   sec.innerHTML = "";
 
-  const q = $("#search").value.toLowerCase();
-  const bf = $("#bloodFilter").value;
+  const q = ($("#search")?.value || "").toLowerCase();
+  const bf = $("#bloodFilter")?.value || "";
 
   const filtered = donors.filter(d =>
     (!bf || d.bloodGroup === bf) &&
-    (d.name.toLowerCase().includes(q) ||
-      d.phone.toLowerCase().includes(q) ||
-      d.location.toLowerCase().includes(q))
+    (
+      (d.name && d.name.toLowerCase().includes(q)) ||
+      (d.phone && d.phone.toLowerCase().includes(q)) ||
+      (d.location && d.location.toLowerCase().includes(q))
+    )
   );
 
   const ownerId = getOwnerId();
@@ -144,8 +147,8 @@ function render() {
   }
 }
 
-/* OPEN FORM */
-function openForm(mode, id) {
+/* OPEN FORM (global for inline onclick) */
+window.openForm = function (mode, id) {
   $("#formDrawer").setAttribute("aria-hidden", "false");
   $("#donorForm").reset();
 
@@ -168,7 +171,7 @@ function openForm(mode, id) {
     $("#location").value = d.location;
     $("#donorId").value = d.id;
   }
-}
+};
 
 function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
@@ -186,6 +189,33 @@ function sendEmail(rec) {
     console.error("Error saving donor to Firebase:", err);
     // Optional: show a toast / alert
     // alert("Could not save to online database, but saved on this device.");
+  });
+}
+
+/* LOAD FROM FIREBASE + MERGE WITH LOCAL (display previous data) */
+function startFirebaseSync() {
+  if (!window._firebase) return; // Firebase not ready
+
+  const { db, ref, onValue } = window._firebase;
+  const donorsRef = ref(db, "donors");
+
+  onValue(donorsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    const firebaseList = Object.values(data);
+
+    // Merge local + firebase by id (firebase wins)
+    const byId = new Map(donors.map(d => [d.id, d]));
+    firebaseList.forEach(rec => {
+      byId.set(rec.id, rec);
+    });
+
+    donors = Array.from(byId.values())
+      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // latest first
+
+    save();
+    render();
   });
 }
 
@@ -282,6 +312,7 @@ window.addEventListener("resize", render);
 /* INIT + DEFAULT DATA */
 load();
 
+// Default seed data only on very first visit (local empty)
 if (donors.length === 0) {
   donors = [
     {
@@ -549,4 +580,8 @@ if (donors.length === 0) {
   save();
 }
 
+// First render whatever we have locally
 render();
+
+// Then sync with Firebase to load previous donors (online)
+startFirebaseSync();
