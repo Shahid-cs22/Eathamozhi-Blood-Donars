@@ -557,6 +557,16 @@ if (donors.length === 0) {
     },
     {
       id: uid(),
+      name: "Ragul R",
+      bloodGroup: "A+",
+      dob: "2005-01-07",
+      phone: "+91 8220222351",
+      email: "Not Provided",
+      location: "Karungal",
+      addedAt: new Date("2025-12-01").toISOString()
+    },
+    {
+      id: uid(),
       name: "Lejo J",
       bloodGroup: "B+",
       dob: "2005-03-20",
