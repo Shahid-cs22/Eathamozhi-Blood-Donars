@@ -581,7 +581,7 @@ if (donors.length === 0) {
 }
 
 // First render whatever we have locally
-render();
+// render();
 
 // Then sync with Firebase to load previous donors (online)
 startFirebaseSync();
