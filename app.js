@@ -508,7 +508,37 @@ if (donors.length === 0) {
       phone: "+91 7418061816",
       email: "thishon5746@gmail.com",
       location: "Koilvilai-Nagercoil",
-      addedAt: new Date("2025-11-30").toISOString() //23
+      addedAt: new Date("2025-11-30").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Anantha Krishnan",
+      bloodGroup: "B+",
+      dob: "1994-04-05",
+      phone: "+91 8870536949",
+      email: "ananthananthc9@gmail.com",
+      location: "Thuckalay",
+      addedAt: new Date("2025-12-01").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Lejo J",
+      bloodGroup: "B+",
+      dob: "2005-03-20",
+      phone: "+91 7395918325",
+      email: "Not Provided",
+      location: "Thuckalay",
+      addedAt: new Date("2025-12-01").toISOString() 
+    },
+    {
+      id: uid(),
+      name: "Joseph Rishan V",
+      bloodGroup: "O+",
+      dob: "2005-02-02",
+      phone: "+91 6385732349",
+      email: "Not Provided",
+      location: "Kadiyapattanam",
+      addedAt: new Date("2025-11-30").toISOString() //26
     }
   ];
 
