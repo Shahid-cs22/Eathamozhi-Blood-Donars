@@ -1,4 +1,4 @@
-/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with 3-digit IDs & Latest on Top */
+/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with 3-digit IDs, Latest on Top, Loading State */
 
 const OWNER_KEY = 'eathamozhi_my_donor_id';
 
@@ -190,7 +190,7 @@ async function getNextId() {
         const maxId = ids.length ? Math.max(...ids) : 0;
         const nextNum = maxId + 1;
 
-        resolve(String(nextNum).padStart(3, "0"));
+        resolve(String(nextNum).padStart(3, "0")); // 001, 002, 003...
       },
       () => resolve("001"),
       { onlyOnce: true }
@@ -214,19 +214,35 @@ function sendEmail(rec) {
   });
 }
 
-/* LOAD FROM FIREBASE (newest first) */
+/* LOAD FROM FIREBASE (newest first) + LOADING STATE */
 function startFirebaseSync() {
   if (!window._firebase) return;
 
   const { db, ref, onValue } = window._firebase;
   const donorsRef = ref(db, "donors");
 
+  const sec = document.querySelector("#listSection");
+  if (sec) {
+    sec.innerHTML = `
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <div>Loading donors from server...</div>
+      </div>
+    `;
+  }
+
   onValue(donorsRef, (snapshot) => {
     const data = snapshot.val();
 
     if (!data) {
       donors = [];
-      render();
+      if (sec) {
+        sec.innerHTML = `
+          <div class="loading-state">
+            No donors found yet. Please add the first donor.
+          </div>
+        `;
+      }
       return;
     }
 
@@ -241,7 +257,7 @@ function startFirebaseSync() {
 $("#donorForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  let id = $("#donorId").value; 
+  let id = $("#donorId").value;
 
   if (!id) {
     id = await getNextId();
@@ -273,8 +289,11 @@ $("#donorForm").addEventListener("submit", async e => {
 
   closeForm();
 
-  if (idx < 0) donors.unshift(rec);
-  else donors[idx] = rec;
+  if (idx < 0) {
+    donors.unshift(rec);
+  } else {
+    donors[idx] = rec;
+  }
 
   donors.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // newest first
 
@@ -335,8 +354,9 @@ window.addEventListener("resize", render);
 window.addEventListener("load", () => {
   render();
 
-  if (window._firebase) startFirebaseSync();
-  else {
+  if (window._firebase) {
+    startFirebaseSync();
+  } else {
     const t = setInterval(() => {
       if (window._firebase) {
         clearInterval(t);
