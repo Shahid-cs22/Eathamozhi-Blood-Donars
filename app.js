@@ -615,6 +615,16 @@ if (donors.length === 0) {
       email: "jebarshanj@gmail.com",
       location: "Mondaikadu",
       addedAt: new Date("2025-12-02").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Arul Noble",
+      bloodGroup: "O+",
+      dob: "2004-09-28",
+      phone: "+91 9159884958",
+      email: "arulnoble2005@gmail.com",
+      location: "Vattakarai-Nagercoil",
+      addedAt: new Date("2025-12-02").toISOString()
     }
   ];
 
