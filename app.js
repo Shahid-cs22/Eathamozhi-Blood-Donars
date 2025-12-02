@@ -1,4 +1,4 @@
-/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with Continuous IDs */
+/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with 3-digit Continuous IDs */
 
 const OWNER_KEY = 'eathamozhi_my_donor_id';
 
@@ -8,8 +8,6 @@ const $ = (s) => document.querySelector(s);
 /* OWNER HELP */
 function getOwnerId() { return localStorage.getItem(OWNER_KEY); }
 function setOwnerId(id) { localStorage.setItem(OWNER_KEY, id); }
-
-function uid() { return "d_" + Math.random().toString(36).slice(2, 10); } // no longer used, but kept if needed
 
 /* AGE */
 function computeAge(dob) {
@@ -70,7 +68,7 @@ function render() {
     t.className = "table";
     t.innerHTML = `
       <thead><tr>
-        <th>Name</th><th>Blood</th><th>Age</th>
+        <th>ID</th><th>Name</th><th>Blood</th><th>Age</th>
         <th>Location</th><th>District</th>
         <th>Added</th><th>Edit</th>
       </tr></thead>
@@ -83,6 +81,7 @@ function render() {
       const canEdit = ownerId === d.id;
       const tr = document.createElement("tr");
       tr.innerHTML = `
+        <td>${d.id}</td>
         <td>${d.name}</td>
         <td>${d.bloodGroup}</td>
         <td>${computeAge(d.dob)}</td>
@@ -112,7 +111,7 @@ function render() {
         <div class="meta-main">
           <div class="badge" data-bg="${d.bloodGroup}">${d.bloodGroup}</div>
           <div class="meta-text">
-            <strong>${d.name}</strong>
+            <strong>#${d.id} • ${d.name}</strong>
             <span>${computeAge(d.dob)} yrs • ${d.location}</span>
           </div>
         </div>
@@ -164,7 +163,7 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
-/* CONTINUOUS NUMERIC IDs: get next ID from Firebase */
+/* CONTINUOUS 3-DIGIT IDs: get next ID from Firebase */
 async function getNextId() {
   if (!window._firebase) {
     alert("Online database not ready. Please wait a moment and try again.");
@@ -180,17 +179,24 @@ async function getNextId() {
       (snapshot) => {
         const data = snapshot.val();
         if (!data) {
-          resolve("1"); // first donor
+          resolve("001"); // first donor
           return;
         }
 
-        const ids = Object.keys(data).map(k => Number(k)).filter(n => !isNaN(n));
+        const ids = Object.keys(data)
+          .map(k => Number(k))
+          .filter(n => !isNaN(n));
+
         const maxId = ids.length ? Math.max(...ids) : 0;
-        resolve(String(maxId + 1)); // always string ID
+        const nextNum = maxId + 1;
+
+        const padded = String(nextNum).padStart(3, "0"); // 001, 002, 003...
+        resolve(padded);
       },
       (error) => {
         console.error("Error reading donors for next ID:", error);
-        resolve(String(Date.now())); // fallback unique ID
+        const fallback = String(new Date().getTime() % 1000).padStart(3, "0");
+        resolve(fallback);
       },
       { onlyOnce: true }
     );
@@ -206,7 +212,7 @@ function sendEmail(rec) {
   }
 
   const { db, ref, set } = window._firebase;
-  const donorRef = ref(db, "donors/" + rec.id); // numeric string key: "1", "2", ...
+  const donorRef = ref(db, "donors/" + rec.id); // "001", "002", ...
 
   return set(donorRef, rec).catch(err => {
     console.error("Error saving donor to Firebase:", err);
@@ -234,7 +240,7 @@ function startFirebaseSync() {
     }
 
     donors = Object.values(data)
-      .sort((a, b) => Number(a.id) - Number(b.id)); // sort by numeric ID: 1,2,3,...
+      .sort((a, b) => Number(a.id) - Number(b.id)); // sort by numeric ID: 1,2,3...
 
     render();
   });
@@ -244,9 +250,9 @@ function startFirebaseSync() {
 $("#donorForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  let id = $("#donorId").value; // if editing, will have value
+  let id = $("#donorId").value; // if editing, will have ID
 
-  // If new donor → assign next numeric ID from Firebase
+  // If new donor → assign next 3-digit ID from Firebase
   if (!id) {
     id = await getNextId();
   }
@@ -281,7 +287,7 @@ $("#donorForm").addEventListener("submit", async e => {
 
   // Optional: immediate local update
   if (isNew) {
-    donors.push(rec);             // push then sort to keep ID order
+    donors.push(rec);
     donors.sort((a, b) => Number(a.id) - Number(b.id));
   } else {
     donors[idx] = rec;
@@ -300,7 +306,7 @@ $("#dob").addEventListener("change", () => {
 $("#search").addEventListener("input", render);
 $("#bloodFilter").addEventListener("change", render);
 
-/* EXPORT CSV (no phone, add District) */
+/* EXPORT CSV (ID + details) */
 $("#exportBtn").addEventListener("click", () => {
   const rows = [
     ["ID", "Name", "Blood", "DOB", "Age", "Location", "District", "Email", "Added"],
