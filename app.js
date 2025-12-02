@@ -1,4 +1,4 @@
-/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync (NO local load) */
+/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with Continuous IDs */
 
 const OWNER_KEY = 'eathamozhi_my_donor_id';
 
@@ -9,7 +9,7 @@ const $ = (s) => document.querySelector(s);
 function getOwnerId() { return localStorage.getItem(OWNER_KEY); }
 function setOwnerId(id) { localStorage.setItem(OWNER_KEY, id); }
 
-function uid() { return "d_" + Math.random().toString(36).slice(2, 10); }
+function uid() { return "d_" + Math.random().toString(36).slice(2, 10); } // no longer used, but kept if needed
 
 /* AGE */
 function computeAge(dob) {
@@ -164,6 +164,39 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
+/* CONTINUOUS NUMERIC IDs: get next ID from Firebase */
+async function getNextId() {
+  if (!window._firebase) {
+    alert("Online database not ready. Please wait a moment and try again.");
+    throw new Error("Firebase not ready");
+  }
+
+  const { db, ref, onValue } = window._firebase;
+  const donorsRef = ref(db, "donors");
+
+  return new Promise(resolve => {
+    onValue(
+      donorsRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+          resolve("1"); // first donor
+          return;
+        }
+
+        const ids = Object.keys(data).map(k => Number(k)).filter(n => !isNaN(n));
+        const maxId = ids.length ? Math.max(...ids) : 0;
+        resolve(String(maxId + 1)); // always string ID
+      },
+      (error) => {
+        console.error("Error reading donors for next ID:", error);
+        resolve(String(Date.now())); // fallback unique ID
+      },
+      { onlyOnce: true }
+    );
+  });
+}
+
 /* SAVE TO FIREBASE */
 function sendEmail(rec) {
   if (!window._firebase) {
@@ -173,7 +206,7 @@ function sendEmail(rec) {
   }
 
   const { db, ref, set } = window._firebase;
-  const donorRef = ref(db, "donors/" + rec.id);
+  const donorRef = ref(db, "donors/" + rec.id); // numeric string key: "1", "2", ...
 
   return set(donorRef, rec).catch(err => {
     console.error("Error saving donor to Firebase:", err);
@@ -181,7 +214,7 @@ function sendEmail(rec) {
   });
 }
 
-/* LOAD FROM FIREBASE (live auto update on all phones) */
+/* LOAD FROM FIREBASE (live auto update on all devices) */
 function startFirebaseSync() {
   if (!window._firebase) {
     console.warn("Firebase not ready when startFirebaseSync was called.");
@@ -201,7 +234,7 @@ function startFirebaseSync() {
     }
 
     donors = Object.values(data)
-      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // latest first
+      .sort((a, b) => Number(a.id) - Number(b.id)); // sort by numeric ID: 1,2,3,...
 
     render();
   });
@@ -211,7 +244,13 @@ function startFirebaseSync() {
 $("#donorForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  const id = $("#donorId").value || uid();
+  let id = $("#donorId").value; // if editing, will have value
+
+  // If new donor → assign next numeric ID from Firebase
+  if (!id) {
+    id = await getNextId();
+  }
+
   const idx = donors.findIndex(d => d.id === id);
 
   const rec = {
@@ -231,9 +270,8 @@ $("#donorForm").addEventListener("submit", async e => {
   }
 
   const isNew = idx < 0;
-
   if (isNew) {
-    setOwnerId(id);
+    setOwnerId(id); // owner can edit their own donor
   }
 
   // Write to Firebase – all devices will auto-update via startFirebaseSync()
@@ -243,13 +281,14 @@ $("#donorForm").addEventListener("submit", async e => {
 
   // Optional: immediate local update
   if (isNew) {
-    donors.unshift(rec);
+    donors.push(rec);             // push then sort to keep ID order
+    donors.sort((a, b) => Number(a.id) - Number(b.id));
   } else {
     donors[idx] = rec;
   }
   render();
 
-  alert("📩 Your request has been sent successfully. Thank you! ✔️");
+  alert("📩 Donor saved successfully. Thank you! ✔️");
 });
 
 /* AUTO AGE */
@@ -264,8 +303,9 @@ $("#bloodFilter").addEventListener("change", render);
 /* EXPORT CSV (no phone, add District) */
 $("#exportBtn").addEventListener("click", () => {
   const rows = [
-    ["Name", "Blood", "DOB", "Age", "Location", "District", "Email", "Added"],
+    ["ID", "Name", "Blood", "DOB", "Age", "Location", "District", "Email", "Added"],
     ...donors.map(d => [
+      d.id,
       d.name,
       d.bloodGroup,
       d.dob,
@@ -300,21 +340,16 @@ $("#themeToggle").addEventListener("click", () => {
 
 window.addEventListener("resize", render);
 
-/* ---------- INIT (NO load()) ---------- */
+/* ---------- INIT (NO local load()) ---------- */
 
-/*
-  Important: wait until the whole page (including the Firebase
-  module script in index.html) is fully loaded.
-*/
 window.addEventListener("load", () => {
-  // First empty render (just in case)
+  // Initial empty render
   render();
 
-  // When Firebase module finished, window._firebase will exist
+  // Wait for Firebase module to be ready, then start sync
   if (window._firebase) {
     startFirebaseSync();
   } else {
-    // Small safety delay if module is slightly late
     const interval = setInterval(() => {
       if (window._firebase) {
         clearInterval(interval);
