@@ -312,7 +312,7 @@ window.addEventListener("resize", render);
 /* ---------- INIT FLOW ---------- */
 
 // 1) Load from localStorage (optional/offline)
-load();
+
 
 // 2) First render whatever we have locally
 render();
