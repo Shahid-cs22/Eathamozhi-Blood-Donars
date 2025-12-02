@@ -259,6 +259,7 @@ $("#donorForm").addEventListener("submit", e => {
 
   closeForm();
   render();
+  alert("📩 Your request has been sent successfully. Thank you! ✔️");
 });
 
 /* AUTO AGE */
@@ -618,7 +619,7 @@ if (donors.length === 0) {
   ];
 
   save();
-  alert("📩 Your request has been sent successfully. Thank you! ✔️");
+
 
 }
 
