@@ -618,6 +618,8 @@ if (donors.length === 0) {
   ];
 
   save();
+  alert("📩 Your request has been sent successfully. Thank you! ✔️");
+
 }
 
 // First render whatever we have locally
