@@ -278,5 +278,35 @@ donors = [
         email: "ramarragul72@gmail.com",
         location: "Ganapathipuram",
         addedAt: new Date("2025-12-01").toISOString()
+    },
+    {
+        id: uid(),
+        name: "Mohammed Husain",
+        bloodGroup: "O+",
+        dob: "2002-12-23",
+        phone: "+91 9791870680",
+        email: "husainnazith@gmail.com",
+        location: "Eathamozhi",
+        addedAt: new Date("2025-12-02").toISOString()
+    },
+    {
+        id: uid(),
+        name: "Jebarshan J",
+        bloodGroup: "B+",
+        dob: "2004-09-28",
+        phone: "+91 9791870680",
+        email: "jebarshanj@gmail.com",
+        location: "Mondaikadu",
+        addedAt: new Date("2025-12-02").toISOString()
+    },
+    {
+        id: uid(),
+        name: "Arul Noble",
+        bloodGroup: "O+",
+        dob: "2004-09-28",
+        phone: "+91 9159884958",
+        email: "arulnoble2005@gmail.com",
+        location: "Vattakarai-Nagercoil",
+        addedAt: new Date("2025-12-02").toISOString()
     }
 ];
