@@ -335,7 +335,7 @@ body.dark .card-info-line{
   box-shadow:0 3px 10px rgba(0,0,0,0.25);
 }
 
-/* Color by group (simple mapping) */
+/* Color by group */
 .badge[data-bg^="A+"]{ background:#f97316; }
 .badge[data-bg^="A-"]{ background:#ea580c; }
 .badge[data-bg^="B+"]{ background:#0ea5e9; }
@@ -345,7 +345,7 @@ body.dark .card-info-line{
 .badge[data-bg^="O-"]{ background:#b91c1c; }
 .badge[data-bg^="A2B+"]{ background:#d609bb; }
 
-/* Eligibility pill (optional if you later add logic) */
+/* Eligibility pill (for future use) */
 .pill{
   padding:3px 9px;
   border-radius:999px;

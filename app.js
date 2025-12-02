@@ -81,7 +81,7 @@ function render() {
     t.innerHTML = `
       <thead><tr>
         <th>Name</th><th>Blood</th><th>Age</th>
-        <th>Phone</th><th>Location</th>
+        <th>Location</th><th>District</th>
         <th>Added</th><th>Edit</th>
       </tr></thead>
       <tbody></tbody>
@@ -96,15 +96,15 @@ function render() {
         <td>${d.name}</td>
         <td>${d.bloodGroup}</td>
         <td>${computeAge(d.dob)}</td>
-        <td>${d.phone}</td>
         <td>${d.location}</td>
+        <td>Kanyakumari</td>
         <td>
           <small>${relativeTime(d.addedAt)}</small>
         </td>
         <td>
           ${canEdit
-          ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-          : `<span style="color:#999;font-size:12px;">No Access</span>`}
+            ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
+            : `<span style="color:#999;font-size:12px;">No Access</span>`}
         </td>
       `;
       body.appendChild(tr);
@@ -130,7 +130,7 @@ function render() {
         </div>
 
         <div class="card-info-line">
-          <strong>Phone:</strong> ${d.phone}<br>
+          <strong>Location:</strong> ${d.location}<br>
           <strong>Email:</strong> ${d.email || "—"}<br>
           <strong>Added:</strong> <small>${relativeTime(d.addedAt)}</small>
         </div>
@@ -138,8 +138,8 @@ function render() {
         <div class="card-footer">
           <small>ID: ${d.id}</small>
           ${canEdit
-          ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-          : `<span style="color:#999;font-size:12px;">View Only</span>`}
+            ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
+            : `<span style="color:#999;font-size:12px;">View Only</span>`}
         </div>
       `;
       sec.appendChild(card);
@@ -231,7 +231,7 @@ $("#donorForm").addEventListener("submit", e => {
     name: $("#name").value.trim(),
     bloodGroup: $("#bloodGroup").value,
     dob: $("#dob").value,
-    phone: $("#phone").value.trim(),
+    phone: $("#phone").value.trim(), // saved but not shown
     email: ($("#email").value.trim() || "Not Provided"),
     location: $("#location").value.trim(),
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
