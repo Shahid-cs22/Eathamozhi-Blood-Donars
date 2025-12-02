@@ -1,18 +1,9 @@
-/* Nagercoil / Eathamozhi Blood Donors - Final Version with Firebase Live Sync */
+/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync (NO local load) */
 
-const STORAGE_KEY = 'eathamozhi_blood_donors_v1';
 const OWNER_KEY = 'eathamozhi_my_donor_id';
 
 let donors = [];
 const $ = (s) => document.querySelector(s);
-
-/* LOAD & SAVE (LocalStorage) */
-function load() {
-  donors = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-}
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(donors));
-}
 
 /* OWNER HELP */
 function getOwnerId() { return localStorage.getItem(OWNER_KEY); }
@@ -31,15 +22,14 @@ function computeAge(dob) {
   return age;
 }
 
-/* DATE FORMAT (unused but handy) */
-function formatDate(iso) { return new Date(iso).toLocaleDateString("en-GB"); }
-
 /* RELATIVE TIME */
 function relativeTime(dateIso) {
+  if (!dateIso) return "";
   const now = new Date();
   const past = new Date(dateIso);
-  const seconds = Math.floor((now - past) / 1000);
+  if (isNaN(past)) return "";
 
+  const seconds = Math.floor((now - past) / 1000);
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   const intervals = {
@@ -174,22 +164,20 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
-/* SAVE TO FIREBASE (instead of EmailJS) */
+/* SAVE TO FIREBASE */
 function sendEmail(rec) {
-  // This function now syncs to Firebase Realtime Database
   if (!window._firebase) return; // Firebase not ready
 
   const { db, ref, set } = window._firebase;
   const donorRef = ref(db, "donors/" + rec.id);
 
-  set(donorRef, rec).catch(err => {
+  return set(donorRef, rec).catch(err => {
     console.error("Error saving donor to Firebase:", err);
-    // Optional: show a toast / alert
-    // alert("Could not save to online database, but saved on this device.");
+    alert("Could not save to online database. Please try again.");
   });
 }
 
-/* LOAD FROM FIREBASE (live auto update) */
+/* LOAD FROM FIREBASE (live auto update on all phones) */
 function startFirebaseSync() {
   if (!window._firebase) return; // Firebase not ready
 
@@ -201,25 +189,19 @@ function startFirebaseSync() {
 
     if (!data) {
       donors = [];
-      save();
       render();
       return;
     }
 
-    // Use Firebase as the source of truth
     donors = Object.values(data)
       .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // latest first
 
-    // Keep a local copy (optional)
-    save();
-
-    // Update UI
     render();
   });
 }
 
 /* SAVE FORM */
-$("#donorForm").addEventListener("submit", e => {
+$("#donorForm").addEventListener("submit", async e => {
   e.preventDefault();
 
   const id = $("#donorId").value || uid();
@@ -230,7 +212,7 @@ $("#donorForm").addEventListener("submit", e => {
     name: $("#name").value.trim(),
     bloodGroup: $("#bloodGroup").value,
     dob: $("#dob").value,
-    phone: $("#phone").value.trim(), // saved (hidden in UI)
+    phone: $("#phone").value.trim(),
     email: ($("#email").value.trim() || "Not Provided"),
     location: $("#location").value.trim(),
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
@@ -244,20 +226,24 @@ $("#donorForm").addEventListener("submit", e => {
   const isNew = idx < 0;
 
   if (isNew) {
-    donors.unshift(rec);
     setOwnerId(id);
+  }
+
+  // Just write to Firebase – all devices (including this one)
+  // will auto-update via startFirebaseSync()
+  await sendEmail(rec);
+
+  closeForm();
+
+  // Optional: immediate visual update on current device
+  // (Firebase will overwrite with the same data anyway)
+  if (isNew) {
+    donors.unshift(rec);
   } else {
     donors[idx] = rec;
   }
-
-  // Local save
-  save();
-
-  // Online save
-  sendEmail(rec);
-
-  closeForm();
   render();
+
   alert("📩 Your request has been sent successfully. Thank you! ✔️");
 });
 
@@ -309,27 +295,11 @@ $("#themeToggle").addEventListener("click", () => {
 
 window.addEventListener("resize", render);
 
-/* ---------- INIT FLOW ---------- */
+/* ---------- INIT (NO load()) ---------- */
 
-// 1) Load from localStorage (optional/offline)
-
-
-// 2) First render whatever we have locally
+// Render empty state first
 render();
 
-// 3) Then sync with Firebase to load + auto-update donors (online)
+// Start live sync with Firebase – this will fill `donors` and
+// keep all devices (phones + main webpage) in sync automatically
 startFirebaseSync();
-
-
-//  If you want seed data only for testing, you can temporarily use this:
-
- if (donors.length === 0) {
-   donors = [
-     { id: uid(), name: "Test Donor", bloodGroup: "O+", dob: "2000-01-01",
-       phone: "+91 0000000000", email: "test@example.com",
-       location: "Nagercoil", addedAt: new Date().toISOString() }
-   ];
-   save();
-   donors.forEach(sendEmail); // push once to Firebase
- }
- 
