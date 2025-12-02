@@ -320,16 +320,16 @@ render();
 // 3) Then sync with Firebase to load + auto-update donors (online)
 startFirebaseSync();
 
-/*
- * If you want seed data only for testing, you can temporarily use this:
- *
- * if (donors.length === 0) {
- *   donors = [
- *     { id: uid(), name: "Test Donor", bloodGroup: "O+", dob: "2000-01-01",
- *       phone: "+91 0000000000", email: "test@example.com",
- *       location: "Nagercoil", addedAt: new Date().toISOString() }
- *   ];
- *   save();
- *   donors.forEach(sendEmail); // push once to Firebase
- * }
- */
+
+//  If you want seed data only for testing, you can temporarily use this:
+
+ if (donors.length === 0) {
+   donors = [
+     { id: uid(), name: "Test Donor", bloodGroup: "O+", dob: "2000-01-01",
+       phone: "+91 0000000000", email: "test@example.com",
+       location: "Nagercoil", addedAt: new Date().toISOString() }
+   ];
+   save();
+   donors.forEach(sendEmail); // push once to Firebase
+ }
+ 
