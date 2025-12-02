@@ -103,8 +103,8 @@ function render() {
         </td>
         <td>
           ${canEdit
-            ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-            : `<span style="color:#999;font-size:12px;">No Access</span>`}
+          ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
+          : `<span style="color:#999;font-size:12px;">No Access</span>`}
         </td>
       `;
       body.appendChild(tr);
@@ -138,8 +138,8 @@ function render() {
         <div class="card-footer">
           <small>ID: ${d.id}</small>
           ${canEdit
-            ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-            : `<span style="color:#999;font-size:12px;">View Only</span>`}
+          ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
+          : `<span style="color:#999;font-size:12px;">View Only</span>`}
         </div>
       `;
       sec.appendChild(card);
@@ -594,6 +594,26 @@ if (donors.length === 0) {
       email: "ramarragul72@gmail.com",
       location: "Ganapathipuram",
       addedAt: new Date("2025-12-01").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Mohammed Husain",
+      bloodGroup: "O+",
+      dob: "2002-12-23",
+      phone: "+91 9791870680",
+      email: "husainnazith@gmail.com",
+      location: "Eathamozhi",
+      addedAt: new Date("2025-12-02").toISOString()
+    },
+    {
+      id: uid(),
+      name: "Jebarshan J",
+      bloodGroup: "B+",
+      dob: "2004-09-28",
+      phone: "+91 9791870680",
+      email: "jebarshanj@gmail.com",
+      location: "Mondaikadu",
+      addedAt: new Date("2025-12-02").toISOString()
     }
   ];
 
