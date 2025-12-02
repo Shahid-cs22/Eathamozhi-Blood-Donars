@@ -231,7 +231,7 @@ $("#donorForm").addEventListener("submit", e => {
     name: $("#name").value.trim(),
     bloodGroup: $("#bloodGroup").value,
     dob: $("#dob").value,
-    phone: $("#phone").value.trim(), // saved but not shown
+    phone: $("#phone").value.trim(), // saved (hidden in UI)
     email: ($("#email").value.trim() || "Not Provided"),
     location: $("#location").value.trim(),
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
@@ -270,18 +270,18 @@ $("#dob").addEventListener("change", () => {
 $("#search").addEventListener("input", render);
 $("#bloodFilter").addEventListener("change", render);
 
-/* EXPORT CSV */
+/* EXPORT CSV (no phone, add District) */
 $("#exportBtn").addEventListener("click", () => {
   const rows = [
-    ["Name", "Blood", "DOB", "Age", "Phone", "Email", "Location", "Added"],
+    ["Name", "Blood", "DOB", "Age", "Location", "District", "Email", "Added"],
     ...donors.map(d => [
       d.name,
       d.bloodGroup,
       d.dob,
       computeAge(d.dob),
-      d.phone,
-      d.email,
       d.location,
+      "Kanyakumari",
+      d.email,
       relativeTime(d.addedAt)
     ])
   ];
