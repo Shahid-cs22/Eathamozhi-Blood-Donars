@@ -166,7 +166,11 @@ function closeForm() {
 
 /* SAVE TO FIREBASE */
 function sendEmail(rec) {
-  if (!window._firebase) return; // Firebase not ready
+  if (!window._firebase) {
+    console.error("Firebase not ready, cannot save donor.");
+    alert("Online database is not ready. Please try again after a moment.");
+    return Promise.resolve();
+  }
 
   const { db, ref, set } = window._firebase;
   const donorRef = ref(db, "donors/" + rec.id);
@@ -179,7 +183,10 @@ function sendEmail(rec) {
 
 /* LOAD FROM FIREBASE (live auto update on all phones) */
 function startFirebaseSync() {
-  if (!window._firebase) return; // Firebase not ready
+  if (!window._firebase) {
+    console.warn("Firebase not ready when startFirebaseSync was called.");
+    return;
+  }
 
   const { db, ref, onValue } = window._firebase;
   const donorsRef = ref(db, "donors");
@@ -229,14 +236,12 @@ $("#donorForm").addEventListener("submit", async e => {
     setOwnerId(id);
   }
 
-  // Just write to Firebase – all devices (including this one)
-  // will auto-update via startFirebaseSync()
+  // Write to Firebase – all devices will auto-update via startFirebaseSync()
   await sendEmail(rec);
 
   closeForm();
 
-  // Optional: immediate visual update on current device
-  // (Firebase will overwrite with the same data anyway)
+  // Optional: immediate local update
   if (isNew) {
     donors.unshift(rec);
   } else {
@@ -297,9 +302,24 @@ window.addEventListener("resize", render);
 
 /* ---------- INIT (NO load()) ---------- */
 
-// Render empty state first
-render();
+/*
+  Important: wait until the whole page (including the Firebase
+  module script in index.html) is fully loaded.
+*/
+window.addEventListener("load", () => {
+  // First empty render (just in case)
+  render();
 
-// Start live sync with Firebase – this will fill `donors` and
-// keep all devices (phones + main webpage) in sync automatically
-startFirebaseSync();
+  // When Firebase module finished, window._firebase will exist
+  if (window._firebase) {
+    startFirebaseSync();
+  } else {
+    // Small safety delay if module is slightly late
+    const interval = setInterval(() => {
+      if (window._firebase) {
+        clearInterval(interval);
+        startFirebaseSync();
+      }
+    }, 300);
+  }
+});
