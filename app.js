@@ -1,4 +1,4 @@
-/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with 3-digit Continuous IDs */
+/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with 3-digit IDs & Latest on Top */
 
 const OWNER_KEY = 'eathamozhi_my_donor_id';
 
@@ -111,7 +111,7 @@ function render() {
         <div class="meta-main">
           <div class="badge" data-bg="${d.bloodGroup}">${d.bloodGroup}</div>
           <div class="meta-text">
-            <strong>#${d.id} • ${d.name}</strong>
+            <strong>${d.name}</strong>
             <span>${computeAge(d.dob)} yrs • ${d.location}</span>
           </div>
         </div>
@@ -163,7 +163,7 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
-/* CONTINUOUS 3-DIGIT IDs: get next ID from Firebase */
+/* CONTINUOUS 3-DIGIT IDs */
 async function getNextId() {
   if (!window._firebase) {
     alert("Online database not ready. Please wait a moment and try again.");
@@ -179,7 +179,7 @@ async function getNextId() {
       (snapshot) => {
         const data = snapshot.val();
         if (!data) {
-          resolve("001"); // first donor
+          resolve("001");
           return;
         }
 
@@ -190,14 +190,9 @@ async function getNextId() {
         const maxId = ids.length ? Math.max(...ids) : 0;
         const nextNum = maxId + 1;
 
-        const padded = String(nextNum).padStart(3, "0"); // 001, 002, 003...
-        resolve(padded);
+        resolve(String(nextNum).padStart(3, "0"));
       },
-      (error) => {
-        console.error("Error reading donors for next ID:", error);
-        const fallback = String(new Date().getTime() % 1000).padStart(3, "0");
-        resolve(fallback);
-      },
+      () => resolve("001"),
       { onlyOnce: true }
     );
   });
@@ -206,26 +201,22 @@ async function getNextId() {
 /* SAVE TO FIREBASE */
 function sendEmail(rec) {
   if (!window._firebase) {
-    console.error("Firebase not ready, cannot save donor.");
-    alert("Online database is not ready. Please try again after a moment.");
+    alert("Online database is not ready. Try again shortly.");
     return Promise.resolve();
   }
 
   const { db, ref, set } = window._firebase;
-  const donorRef = ref(db, "donors/" + rec.id); // "001", "002", ...
+  const donorRef = ref(db, "donors/" + rec.id);
 
   return set(donorRef, rec).catch(err => {
-    console.error("Error saving donor to Firebase:", err);
+    console.error("Error saving donor:", err);
     alert("Could not save to online database. Please try again.");
   });
 }
 
-/* LOAD FROM FIREBASE (live auto update on all devices) */
+/* LOAD FROM FIREBASE (newest first) */
 function startFirebaseSync() {
-  if (!window._firebase) {
-    console.warn("Firebase not ready when startFirebaseSync was called.");
-    return;
-  }
+  if (!window._firebase) return;
 
   const { db, ref, onValue } = window._firebase;
   const donorsRef = ref(db, "donors");
@@ -240,7 +231,7 @@ function startFirebaseSync() {
     }
 
     donors = Object.values(data)
-      .sort((a, b) => Number(a.id) - Number(b.id)); // sort by numeric ID: 1,2,3...
+      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // newest FIRST
 
     render();
   });
@@ -250,9 +241,8 @@ function startFirebaseSync() {
 $("#donorForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  let id = $("#donorId").value; // if editing, will have ID
+  let id = $("#donorId").value; 
 
-  // If new donor → assign next 3-digit ID from Firebase
   if (!id) {
     id = await getNextId();
   }
@@ -275,25 +265,20 @@ $("#donorForm").addEventListener("submit", async e => {
     return;
   }
 
-  const isNew = idx < 0;
-  if (isNew) {
-    setOwnerId(id); // owner can edit their own donor
+  if (idx < 0) {
+    setOwnerId(id);
   }
 
-  // Write to Firebase – all devices will auto-update via startFirebaseSync()
   await sendEmail(rec);
 
   closeForm();
 
-  // Optional: immediate local update
-  if (isNew) {
-    donors.push(rec);
-    donors.sort((a, b) => Number(a.id) - Number(b.id));
-  } else {
-    donors[idx] = rec;
-  }
-  render();
+  if (idx < 0) donors.unshift(rec);
+  else donors[idx] = rec;
 
+  donors.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // newest first
+
+  render();
   alert("📩 Donor saved successfully. Thank you! ✔️");
 });
 
@@ -306,7 +291,7 @@ $("#dob").addEventListener("change", () => {
 $("#search").addEventListener("input", render);
 $("#bloodFilter").addEventListener("change", render);
 
-/* EXPORT CSV (ID + details) */
+/* EXPORT CSV */
 $("#exportBtn").addEventListener("click", () => {
   const rows = [
     ["ID", "Name", "Blood", "DOB", "Age", "Location", "District", "Email", "Added"],
@@ -346,19 +331,15 @@ $("#themeToggle").addEventListener("click", () => {
 
 window.addEventListener("resize", render);
 
-/* ---------- INIT (NO local load()) ---------- */
-
+/* ---------- INIT ---------- */
 window.addEventListener("load", () => {
-  // Initial empty render
   render();
 
-  // Wait for Firebase module to be ready, then start sync
-  if (window._firebase) {
-    startFirebaseSync();
-  } else {
-    const interval = setInterval(() => {
+  if (window._firebase) startFirebaseSync();
+  else {
+    const t = setInterval(() => {
       if (window._firebase) {
-        clearInterval(interval);
+        clearInterval(t);
         startFirebaseSync();
       }
     }, 300);
