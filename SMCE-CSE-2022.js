@@ -668,7 +668,7 @@ export const stu = [
     DOB: "07-10-2004 (18)",
     Address: "5/23 h-8\nm.m.k street\nnagercoil-629601",
     Blood_Group: "B+ve",
-    Mobile_Number: "75985 31831"
+    Mobile_Number: "7598531831"
   },
   {
     id: 62,
@@ -789,7 +789,7 @@ export const stu = [
     DOB: "02-08-2005 (18)",
     Address: "20/15 C\nMANCODE,KANATTUVILAI\nTHICKANAMCODE-629804",
     Blood_Group: "B+ve",
-    Mobile_Number: "77081 03100"
+    Mobile_Number: "7708103100"
   },
   {
     id: 73,
@@ -965,7 +965,7 @@ export const stu = [
     DOB: "03-07-2004 (19)",
     Address: "109\nST.MARYS STREET\nTHALAVAIPURAM-629004",
     Blood_Group: "O+ve",
-    Mobile_Number: "85250 10198"
+    Mobile_Number: "8525010198"
   },
   {
     id: 89,
@@ -987,7 +987,7 @@ export const stu = [
     DOB: "23-01-2004 (19)",
     Address: "5/133\nVELLALAN VILAI\nNAGERCOIL-629501",
     Blood_Group: "O+ve",
-    Mobile_Number: "63813 54097"
+    Mobile_Number: "6381354097"
   },
   {
     id: 91,
@@ -998,7 +998,7 @@ export const stu = [
     DOB: "21-10-2003 (19)",
     Address: "3/303\nJEBASTHIAR STREET\nCHINNAVILLAI-629252",
     Blood_Group: "B-ve",
-    Mobile_Number: "97894 59978"
+    Mobile_Number: "9789459978"
   },
   {
     id: 92,
@@ -1207,7 +1207,7 @@ export const stu = [
     DOB: "07-05-2004 (19)",
     Address: "13/81 C,selvabavan\nUDAYARVILAI\nCOLACHEL-629251",
     Blood_Group: "B+ve",
-    Mobile_Number: "63823 76476"
+    Mobile_Number: "6382376476"
   },
   {
     id: 111,
@@ -1251,7 +1251,7 @@ export const stu = [
     DOB: "25-02-2005 (18)",
     Address: "24-3/13c\nPALLAVILAI ROAD\nPERUVILAI -629003",
     Blood_Group: "O+ve",
-    Mobile_Number: "98432 35465"
+    Mobile_Number: "9843235465"
   },
   {
     id: 115,
@@ -1273,7 +1273,7 @@ export const stu = [
     DOB: "06-10-2003 (19)",
     Address: "24/73 a\nanbiyam -1\nmulloorthurai-629173",
     Blood_Group: "O+ve",
-    Mobile_Number: "97893 84530"
+    Mobile_Number: "9789384530"
   },
   {
     id: 117,
@@ -1295,7 +1295,7 @@ export const stu = [
     DOB: "13-11-2004 (18)",
     Address: "1-532\njohn paul street\nkadiapattanam-629252",
     Blood_Group: "B+ve",
-    Mobile_Number: "97891 65003"
+    Mobile_Number: "9789165003"
   },
   {
     id: 119,
