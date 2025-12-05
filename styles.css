@@ -344,6 +344,7 @@ body.dark .card-info-line{
 .badge[data-bg^="O+"]{ background:#ef4444; }
 .badge[data-bg^="O-"]{ background:#b91c1c; }
 .badge[data-bg^="A2B+"]{ background:#d609bb; }
+.badge[data-bg^="A1+"]{ background:#faa302; }
 
 /* Eligibility pill (for future use) */
 .pill{
