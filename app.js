@@ -1,13 +1,17 @@
-/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync with 3-digit IDs, Latest on Top, Loading State */
+/* Nagercoil / Eathamozhi Blood Donors - Firebase Live Sync */
 
 const OWNER_KEY = 'eathamozhi_my_donor_id';
 
 let donors = [];
 const $ = (s) => document.querySelector(s);
 
-/* OWNER HELP */
-function getOwnerId() { return localStorage.getItem(OWNER_KEY); }
-function setOwnerId(id) { localStorage.setItem(OWNER_KEY, id); }
+/* OWNER */
+function getOwnerId() {
+  return localStorage.getItem(OWNER_KEY);
+}
+function setOwnerId(id) {
+  localStorage.setItem(OWNER_KEY, id);
+}
 
 /* AGE */
 function computeAge(dob) {
@@ -31,8 +35,13 @@ function relativeTime(dateIso) {
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   const intervals = {
-    year: 31536000, month: 2592000, week: 604800,
-    day: 86400, hour: 3600, minute: 60, second: 1
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+    second: 1
   };
 
   for (const key in intervals) {
@@ -42,10 +51,11 @@ function relativeTime(dateIso) {
   return "just now";
 }
 
-/* RENDER LIST */
+/* RENDER */
 function render() {
   const sec = $("#listSection");
   if (!sec) return;
+
   sec.innerHTML = "";
 
   const q = ($("#search")?.value || "").toLowerCase();
@@ -62,16 +72,18 @@ function render() {
 
   const ownerId = getOwnerId();
 
-  /* Desktop table */
   if (window.innerWidth > 800) {
     const t = document.createElement("table");
     t.className = "table";
+
     t.innerHTML = `
-      <thead><tr>
-        <th>ID</th><th>Name</th><th>Blood</th><th>Age</th>
-        <th>Location</th><th>District</th>
-        <th>Added</th><th>Edit</th>
-      </tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Blood</th><th>Age</th>
+          <th>Location</th><th>District</th>
+          <th>Added</th><th>Edit</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     `;
 
@@ -79,6 +91,7 @@ function render() {
 
     filtered.forEach(d => {
       const canEdit = ownerId === d.id;
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${d.id}</td>
@@ -91,19 +104,17 @@ function render() {
         <td>
           ${canEdit
             ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-            : `<span style="color:#999;font-size:12px;">No Access</span>`}
+            : `<span style="color:#999;">No Access</span>`}
         </td>
       `;
       body.appendChild(tr);
     });
 
     sec.appendChild(t);
-  }
-
-  /* Mobile cards */
-  else {
+  } else {
     filtered.forEach(d => {
       const canEdit = ownerId === d.id;
+
       const card = document.createElement("div");
       card.className = "card";
 
@@ -117,24 +128,25 @@ function render() {
         </div>
 
         <div class="card-info-line">
-          <strong>Location:</strong> ${d.location}<br>
+          <strong>Phone:</strong> ${d.phone}<br>
           <strong>Email:</strong> ${d.email || "—"}<br>
-          <strong>Added:</strong> <small>${relativeTime(d.addedAt)}</small>
+          <strong>Added:</strong> ${relativeTime(d.addedAt)}
         </div>
 
         <div class="card-footer">
           <small>ID: ${d.id}</small>
           ${canEdit
             ? `<button class="primary" onclick="openForm('edit','${d.id}')">Edit</button>`
-            : `<span style="color:#999;font-size:12px;">View Only</span>`}
+            : `<span style="color:#999;">View Only</span>`}
         </div>
       `;
+
       sec.appendChild(card);
     });
   }
 }
 
-/* OPEN FORM (global for inline onclick) */
+/* FORM */
 window.openForm = function (mode, id) {
   $("#formDrawer").setAttribute("aria-hidden", "false");
   $("#donorForm").reset();
@@ -163,97 +175,73 @@ function closeForm() {
   $("#formDrawer").setAttribute("aria-hidden", "true");
 }
 
-/* CONTINUOUS 3-DIGIT IDs */
+/* NEXT ID */
 async function getNextId() {
-  if (!window._firebase) {
-    alert("Online database not ready. Please wait a moment and try again.");
-    throw new Error("Firebase not ready");
-  }
-
   const { db, ref, onValue } = window._firebase;
   const donorsRef = ref(db, "donors");
 
   return new Promise(resolve => {
-    onValue(
-      donorsRef,
-      (snapshot) => {
-        const data = snapshot.val();
-        if (!data) {
-          resolve("001");
-          return;
-        }
+    onValue(donorsRef, (snapshot) => {
+      const data = snapshot.val();
 
-        const ids = Object.keys(data)
-          .map(k => Number(k))
-          .filter(n => !isNaN(n));
+      if (!data) {
+        resolve("001");
+        return;
+      }
 
-        const maxId = ids.length ? Math.max(...ids) : 0;
-        const nextNum = maxId + 1;
+      const ids = Object.keys(data)
+        .map(k => Number(k))
+        .filter(n => !isNaN(n));
 
-        resolve(String(nextNum).padStart(3, "0")); // 001, 002, 003...
-      },
-      () => resolve("001"),
-      { onlyOnce: true }
-    );
+      const next = (Math.max(...ids) + 1).toString().padStart(3, "0");
+      resolve(next);
+    }, { onlyOnce: true });
   });
 }
 
-/* SAVE TO FIREBASE */
-function sendEmail(rec) {
-  if (!window._firebase) {
-    alert("Online database is not ready. Try again shortly.");
-    return Promise.resolve();
-  }
-
+/* SAVE */
+async function saveDonor(rec) {
   const { db, ref, set } = window._firebase;
   const donorRef = ref(db, "donors/" + rec.id);
 
-  return set(donorRef, rec).catch(err => {
-    console.error("Error saving donor:", err);
-    alert("Could not save to online database. Please try again.");
-  });
+  try {
+    await set(donorRef, rec);
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error saving donor");
+  }
 }
 
-/* LOAD FROM FIREBASE (newest first) + LOADING STATE */
+/* FIREBASE SYNC */
 function startFirebaseSync() {
-  if (!window._firebase) return;
-
   const { db, ref, onValue } = window._firebase;
   const donorsRef = ref(db, "donors");
 
-  const sec = document.querySelector("#listSection");
-  if (sec) {
-    sec.innerHTML = `
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <div>Loading donors from server...</div>
-      </div>
-    `;
-  }
+  const sec = $("#listSection");
+
+  sec.innerHTML = `
+    <div class="loading-state">
+      Loading donors...
+    </div>
+  `;
 
   onValue(donorsRef, (snapshot) => {
     const data = snapshot.val();
 
     if (!data) {
       donors = [];
-      if (sec) {
-        sec.innerHTML = `
-          <div class="loading-state">
-            No donors found yet. Please add the first donor.
-          </div>
-        `;
-      }
+      render();
       return;
     }
 
     donors = Object.values(data)
-      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // newest FIRST
+      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
 
     render();
   });
 }
 
-/* SAVE FORM */
+/* SUBMIT */
 $("#donorForm").addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -271,97 +259,56 @@ $("#donorForm").addEventListener("submit", async e => {
     bloodGroup: $("#bloodGroup").value,
     dob: $("#dob").value,
     phone: $("#phone").value.trim(),
-    email: ($("#email").value.trim() || "Not Provided"),
+    email: $("#email").value.trim() || "Not Provided",
     location: $("#location").value.trim(),
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
   };
 
   if (!rec.name || !rec.bloodGroup || !rec.dob || !rec.phone) {
-    alert("Fill all required fields.");
+    alert("Fill all required fields");
     return;
   }
 
-  if (idx < 0) {
-    setOwnerId(id);
-  }
+  if (idx < 0) setOwnerId(id);
 
-  await sendEmail(rec);
+  await saveDonor(rec);
 
   closeForm();
-
-  if (idx < 0) {
-    donors.unshift(rec);
-  } else {
-    donors[idx] = rec;
-  }
-
-  donors.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)); // newest first
-
-  render();
-  alert("📩 Donor saved successfully. Thank you! ✔️");
+  alert("✅ Saved successfully!");
 });
 
-/* AUTO AGE */
+/* EVENTS */
 $("#dob").addEventListener("change", () => {
   $("#age").value = computeAge($("#dob").value);
 });
 
-/* SEARCH + FILTER */
 $("#search").addEventListener("input", render);
 $("#bloodFilter").addEventListener("change", render);
 
-/* EXPORT CSV */
-$("#exportBtn").addEventListener("click", () => {
-  const rows = [
-    ["ID", "Name", "Blood", "DOB", "Age", "Location", "District", "Email", "Added"],
-    ...donors.map(d => [
-      d.id,
-      d.name,
-      d.bloodGroup,
-      d.dob,
-      computeAge(d.dob),
-      d.location,
-      "Kanyakumari",
-      d.email,
-      relativeTime(d.addedAt)
-    ])
-  ];
-
-  const csv = rows.map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "donors.csv";
-  a.click();
-});
-
-/* BUTTONS */
 $("#addBtn").addEventListener("click", () => openForm("add"));
 $("#fabAdd").addEventListener("click", () => openForm("add"));
 $("#cancelBtn").addEventListener("click", closeForm);
 
-/* THEME */
 $("#themeToggle").addEventListener("click", () => {
   document.body.classList.toggle("dark");
-  $("#themeToggle").textContent =
-    document.body.classList.contains("dark") ? "Light Mode" : "Dark Mode";
 });
 
-window.addEventListener("resize", render);
-
-/* ---------- INIT ---------- */
+/* INIT */
 window.addEventListener("load", () => {
   render();
 
-  if (window._firebase) {
-    startFirebaseSync();
-  } else {
-    const t = setInterval(() => {
-      if (window._firebase) {
-        clearInterval(t);
-        startFirebaseSync();
+  let retry = 0;
+
+  const checkFirebase = setInterval(() => {
+    if (window._firebase) {
+      clearInterval(checkFirebase);
+      startFirebaseSync();
+    } else {
+      retry++;
+      if (retry > 20) {
+        clearInterval(checkFirebase);
+        alert("⚠️ Firebase not loading");
       }
-    }, 300);
-  }
+    }
+  }, 500);
 });
