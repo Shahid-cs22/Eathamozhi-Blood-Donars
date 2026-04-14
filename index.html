@@ -29,7 +29,7 @@
 <body>
 
   <!-- Header -->
-  <header class="site-header">
+  <!-- <header class="site-header">
     <div class="brand">
       <img class="logo" src="./images/logo.png" alt="Nagercoil Blood Donors Logo">
       <div class="brand-text">
@@ -41,16 +41,37 @@
     <div class="header-actions">
       <button id="themeToggle" class="ghost-btn">Dark Mode</button>
     </div>
+  </header> -->
+
+
+  <header class="site-header">
+    <div class="hero">
+      <img class="hero-logo" src="./images/logo.png" alt="Logo">
+
+      <h1 class="hero-title">
+        ரஹ்மானியா இளைஞர் நற்பணி மன்றம்
+      </h1>
+
+      <p class="hero-subtitle">
+        அவசர இரத்த தான சேவையில் இணைந்ததற்கு நன்றி ❤️
+      </p>
+
+      <div class="hero-actions">
+        <button id="addBtn" class="primary btn-animated">+ Add Donor</button>
+        <button id="exportBtn" class="primary outlined btn-animated">⬇ Export</button>
+        <button id="themeToggle" class="ghost-btn">🌙</button>
+      </div>
+    </div>
   </header>
 
   <main class="container">
 
     <!-- Controls -->
     <section class="controls card-shell">
-      <div class="primary-actions">
+      <!-- <div class="primary-actions">
         <button id="addBtn" class="primary btn-animated">+ Add Donor</button>
         <button id="exportBtn" class="primary outlined btn-animated">⬇ Export CSV</button>
-      </div>
+      </div> -->
 
       <div class="filters">
         <div class="field">
@@ -152,7 +173,9 @@
   </main>
 
   <footer class="site-footer">
-    <small>&copy; <script>document.write(new Date().getFullYear());</script>. <a href="https://eathamozhi-masjid.netlify.app/" style="text-decoration: none; color:#777;">Eathamozhi Masjid.</a> All Rights Reserved.
+    <small>&copy;
+      <script>document.write(new Date().getFullYear());</script>. <a href="https://eathamozhi-masjid.netlify.app/"
+        style="text-decoration: none; color:#777;">Eathamozhi Masjid.</a> All Rights Reserved.
     </small>
   </footer>
 
