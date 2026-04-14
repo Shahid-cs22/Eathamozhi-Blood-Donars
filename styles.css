@@ -732,3 +732,11 @@ body.dark .badge {
     transform: rotate(360deg);
   }
 }
+
+.available-card {
+  border-left: 5px solid #22c55e;
+}
+
+.unavailable-card {
+  border-left: 5px solid #ef4444;
+}

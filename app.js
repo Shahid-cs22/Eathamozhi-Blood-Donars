@@ -81,6 +81,7 @@ function render() {
         <tr>
           <th>ID</th><th>Name</th><th>Blood</th><th>Age</th>
           <th>Location</th><th>District</th>
+          <th>Status</th>
           <th>Added</th><th>Edit</th>
         </tr>
       </thead>
@@ -100,6 +101,7 @@ function render() {
         <td>${computeAge(d.dob)}</td>
         <td>${d.location}</td>
         <td>Kanyakumari</td>
+        <td>${d.status === "available" ? "🩸 Available" : "❌ Not Available"}</td>
         <td><small>${relativeTime(d.addedAt)}</small></td>
         <td>
           ${canEdit
@@ -111,12 +113,15 @@ function render() {
     });
 
     sec.appendChild(t);
+
   } else {
     filtered.forEach(d => {
       const canEdit = ownerId === d.id;
 
       const card = document.createElement("div");
-      card.className = "card";
+
+      // ✅ Card color
+      card.className = "card " + (d.status === "available" ? "available-card" : "unavailable-card");
 
       card.innerHTML = `
         <div class="meta-main">
@@ -127,8 +132,13 @@ function render() {
           </div>
         </div>
 
+        <!-- ✅ STATUS instead of phone -->
         <div class="card-info-line">
-          <strong>Phone:</strong> ${d.phone}<br>
+          <strong>Status:</strong> 
+          <span class="${d.status === 'available' ? 'pill ok' : 'pill no'}">
+            ${d.status === 'available' ? '🩸 Available' : '❌ Not Available'}
+          </span>
+          <br>
           <strong>Email:</strong> ${d.email || "—"}<br>
           <strong>Added:</strong> ${relativeTime(d.addedAt)}
         </div>
@@ -167,6 +177,7 @@ window.openForm = function (mode, id) {
     $("#phone").value = d.phone;
     $("#email").value = d.email === "Not Provided" ? "" : d.email;
     $("#location").value = d.location;
+    $("#status").value = d.status || "available"; // ✅ load status
     $("#donorId").value = d.id;
   }
 };
@@ -219,11 +230,7 @@ function startFirebaseSync() {
 
   const sec = $("#listSection");
 
-  sec.innerHTML = `
-    <div class="loading-state">
-      Loading donors...
-    </div>
-  `;
+  sec.innerHTML = `<div class="loading-state">Loading donors...</div>`;
 
   onValue(donorsRef, (snapshot) => {
     const data = snapshot.val();
@@ -261,6 +268,7 @@ $("#donorForm").addEventListener("submit", async e => {
     phone: $("#phone").value.trim(),
     email: $("#email").value.trim() || "Not Provided",
     location: $("#location").value.trim(),
+    status: $("#status")?.value || "available", // ✅ NEW
     addedAt: idx >= 0 ? donors[idx].addedAt : new Date().toISOString()
   };
 
